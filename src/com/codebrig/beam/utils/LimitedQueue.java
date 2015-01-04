@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 CodeBrig, LLC. All rights reserved.
+ * Copyright © 2014-2015 CodeBrig, LLC. All rights reserved.
  * CONFIDENTIAL & PROPRIETARY, NOT FOR PUBLIC RELEASE.
  */
 package com.codebrig.beam.utils;

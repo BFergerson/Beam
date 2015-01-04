@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 CodeBrig, LLC.
+ * Copyright © 2014-2015 CodeBrig, LLC.
  * http://www.codebrig.com/
  *
  * Beam - Client/Server & P2P Networking Library
