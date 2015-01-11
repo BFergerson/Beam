@@ -46,7 +46,7 @@ public class TestConnectionHandler extends SystemHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (SystemCommunicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage message) {
         if (comm.isTestingConnection ()) {
             //we are the one testing connection, handle response message
             comm.handleMessage (new SystemMessage (SystemMessageType.TEST_CONNECTION).toBeamMessage ());

@@ -50,7 +50,7 @@ public class HoleRequestHandler extends BeamHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
         UDPPunchMessage holeMessage = new UDPPunchMessage (message);
         String peerIdentifier = holeMessage.getPeerIdentifier ();
         String accessCode = holeMessage.getAccessCode ();

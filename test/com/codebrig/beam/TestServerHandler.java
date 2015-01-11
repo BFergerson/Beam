@@ -44,7 +44,7 @@ public class TestServerHandler extends BasicHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (Communicator comm, BasicMessage message) {
+    public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
         System.out.println ("Client sent message: " + message.getString ("client_message"));
 
         //don't respond

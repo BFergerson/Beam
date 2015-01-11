@@ -50,7 +50,7 @@ public class PunchRequestHandler extends BeamHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
         UDPPunchMessage punchMessage = new UDPPunchMessage (message);
         String peerIdentifier = punchMessage.getPeerIdentifier ();
         String accessCode = punchMessage.getAccessCode ();

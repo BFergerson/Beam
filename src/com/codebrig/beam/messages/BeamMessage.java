@@ -56,7 +56,7 @@ public class BeamMessage<T extends BeamMessage>
     private final HashMap<String, List<String>> messageMap;
     private final long createdTimestamp;
     private long sentTimestamp;
-    private long recievedTimestamp;
+    private long receivedTimestamp;
     private boolean rawData = false;
     private long messageId = -1;
 
@@ -231,15 +231,15 @@ public class BeamMessage<T extends BeamMessage>
         return entrySetBuilder.build ().toByteArray ();
     }
 
-    public void setRecievedTimestamp (long recievedTimestamp) {
-        this.recievedTimestamp = recievedTimestamp;
+    public void setReceivedTimestamp (long receivedTimestamp) {
+        this.receivedTimestamp = receivedTimestamp;
     }
 
     /**
      * @return time message was received
      */
-    public long getRecievedTimestamp () {
-        return recievedTimestamp;
+    public long getReceivedTimestamp () {
+        return receivedTimestamp;
     }
 
     public void setSentTimestamp (long sentTimestamp) {

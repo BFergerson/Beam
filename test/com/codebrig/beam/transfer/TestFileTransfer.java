@@ -92,7 +92,7 @@ public class TestFileTransfer
         {
 
             @Override
-            public BeamMessage messageRecieved (Communicator comm, BasicMessage message) {
+            public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
                 //user wants to transfer a file. establish file transfer channel
                 RawDataChannel rawChannel = comm.createRawDataChannel ();
                 rawChannel.connect (message.getLong ("channel_id"));

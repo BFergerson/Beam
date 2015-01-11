@@ -45,7 +45,7 @@ public class RSATestHandler extends RSABeamHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
         assert (message.get ("rsa_test_variable").equals ("rsa_test_value"));
         System.out.println ("RSA sent message valid!");
 

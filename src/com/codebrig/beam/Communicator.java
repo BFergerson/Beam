@@ -414,7 +414,7 @@ public class Communicator implements Runnable
 
             //send null (a.k.a alert) to any waiting listeners
             for (ImmediateHandler immediateHandler : immediateHandlers) {
-                immediateHandler.messageRecieved (this, null);
+                immediateHandler.messageReceived (this, null);
             }
 
             postConnection ();
@@ -480,7 +480,7 @@ public class Communicator implements Runnable
 //                msg = new BeamMessage (type, buf, type < 0);
 //            }
             //msg.setSentTimestamp (sentTime);
-            msg.setRecievedTimestamp (System.currentTimeMillis ());
+            msg.setReceivedTimestamp (System.currentTimeMillis ());
         }
 
         if (outputMessageTypeData) {
@@ -526,14 +526,14 @@ public class Communicator implements Runnable
 
     public byte[] readStream (int length) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate (length);
-        int recieved = 0;
+        int received = 0;
         byte[] buffer;
 
-        while (recieved < length) {
+        while (received < length) {
             //setup buffer
-            if (recieved + BUFFER_SIZE > length) {
+            if (received + BUFFER_SIZE > length) {
                 //use a smaller buffer as to not overread!
-                buffer = new byte[(length - recieved)];
+                buffer = new byte[(length - received)];
             } else {
                 buffer = new byte[BUFFER_SIZE];
             }
@@ -544,7 +544,7 @@ public class Communicator implements Runnable
                 throw new EOFException ("readStream() == -1");
             } else {
                 buf.put (buffer, 0, read);
-                recieved += read;
+                received += read;
             }
         }
 
@@ -900,11 +900,11 @@ public class Communicator implements Runnable
                     {
 
                         public void run () {
-                            immediateHandler.messageRecieved (Communicator.this, message);
+                            immediateHandler.messageReceived (Communicator.this, message);
                         }
                     }).start ();
                 } else {
-                    immediateHandler.messageRecieved (this, message);
+                    immediateHandler.messageReceived (this, message);
                 }
                 unclaimCommunicator ();
                 return;
@@ -1019,7 +1019,7 @@ public class Communicator implements Runnable
 
             //send null (a.k.a alert) to any waiting listeners
             for (ImmediateHandler immediateHandler : immediateHandlers) {
-                immediateHandler.messageRecieved (this, null);
+                immediateHandler.messageReceived (this, null);
             }
 
             try {
@@ -1239,7 +1239,7 @@ public class Communicator implements Runnable
         }
 
         @Override
-        public BeamMessage messageRecieved (SystemCommunicator comm, BeamMessage msg) {
+        public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage msg) {
             message = msg;
             isWaiting = false;
 

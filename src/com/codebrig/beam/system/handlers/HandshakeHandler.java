@@ -47,7 +47,7 @@ public class HandshakeHandler extends SystemHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (SystemCommunicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage message) {
         if (comm.isHandshakeComplete ()) {
             //ignore; handshake already done
             return null;

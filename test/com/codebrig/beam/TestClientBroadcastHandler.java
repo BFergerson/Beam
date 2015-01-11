@@ -44,7 +44,7 @@ public class TestClientBroadcastHandler extends BasicHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (Communicator comm, BasicMessage message) {
+    public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
         System.out.println (String.format ("%s received broadcast message: %s",
                 comm.getName (), message.getString ("broadcast_message")));
 
