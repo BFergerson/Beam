@@ -88,6 +88,8 @@ Note: Most messages extends BeamMessage. BasicMessage is being extending in this
 
 ## Sending Messages ##
 
+Sending a message will send a message and block waiting for a response.
+
 To create and send a BasicMessage to the server from client
 ```java
 ExampleMessage exampleMessage = new ExampleMessage ();
@@ -101,6 +103,8 @@ System.out.println ("Server response: " + exampleMessage.getString ("server_resp
 
 
 ## Queuing Messages ##
+
+Queuing a message sends a message without waiting for a response.
 
 To create and queue a BasicMessage to the server from client
 ```java
