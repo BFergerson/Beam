@@ -12,7 +12,7 @@ Beam is client/server and peer-to-peer compatible networking library. It provide
 * Secure Communication
 	* AES
 	* RSA
-* P2P Connections
+* P2P Connection
 	* UPNP Connection
 	* UDP Hole Punching
 
@@ -169,11 +169,11 @@ Client
 RSA rsa = new RSA (1024);
 RSAConnection rsaConn = client.establishRSAConnection (rsa);
 BeamMessage rsaMessage = new RSABeamMessage (rsaConn, ENCRYPTED_MESSAGE);
-rsaMessage .set ("secret_variable", "secret_value");
+rsaMessage.set ("secret_variable", "secret_value");
 
 //send and receive response (response is returned decrypted)
-BeamMessage responseMessage = client.getCommunicator ().send (rsaMessage );
-System.out.println ("Server response: " + responseMessage .get ("server_response");
+BeamMessage responseMessage = client.getCommunicator ().send (rsaMessage);
+System.out.println ("Server response: " + responseMessage.get ("server_response");
 ```
 
 Server
@@ -202,7 +202,7 @@ Note: Server must add a RSAHandshakeHandler with the private RSA
 server.addRSAHandshakeHandler (new RSAHandshakeHandler (rsa));
 ```
 
-## P2P Connections ##
+## P2P Connection ##
 
 ### UPNP Connection ###
 
