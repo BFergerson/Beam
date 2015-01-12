@@ -110,7 +110,7 @@ public class UDPPunchClient
             int remotePort = punchMessage.getListenPort ();
 
             boolean successfulPunch = false;
-            //socket.setSoTimeout (2500);
+            socket.setSoTimeout (2500);
             for (int i = 0; i < 3; i++) {
                 try {
                     successfulPunch = socketPunch (remoteIP, remotePort);
@@ -134,6 +134,7 @@ public class UDPPunchClient
             Socket relSocket = reliableSocket.accept ();
 
             Communicator peerComm = new Communicator (relSocket, "UDP Punch Client", false);
+            peerComm.performBeamHandshake ();
             return peerComm;
         }
 
@@ -154,8 +155,7 @@ public class UDPPunchClient
         long num = fromBytes (buf);
         if (num >= 0) {
             //got their number which means my number was lost.
-            //send them negative number so they have something
-            MESSAGE1 = toBytes (-1);
+            //send them our number again
             sendPacket (remoteIP, remotePort, MESSAGE1);
         }
 
@@ -175,31 +175,37 @@ public class UDPPunchClient
             System.out.println ("Hole punch connection established!");
             return true;
         } else {
-            //message 1
-            if (num < ident) {
-                receivePacket (buf);
-                if (Arrays.equals (buf, MESSAGE2)) {
-                    //connection good send msg3
-                    System.out.println ("Phase 2 established!");
-                    sendPacket (remoteIP, remotePort, MESSAGE3);
+            while (true) {
+                //message 1
+                if (num < ident) {
+                    receivePacket (buf);
+                    if (Arrays.equals (buf, MESSAGE2)) {
+                        //connection good send msg3
+                        System.out.println ("Phase 2 established!");
+                        sendPacket (remoteIP, remotePort, MESSAGE3);
 
-                    //connection established!
-                    System.out.println ("Hole punch connection established!");
-                    return true;
-                } else if (Arrays.equals (buf, MESSAGE3)) {
-                    //connection established!
-                    System.out.println ("Hole punch connection established!");
-                    return true;
-                }
-            } else {
-                sendPacket (remoteIP, remotePort, MESSAGE2);
-                receivePacket (buf);
-                System.out.println ("Phase 2 established!");
+                        //connection established!
+                        System.out.println ("Hole punch connection established!");
+                        return true;
+                    } else if (Arrays.equals (buf, MESSAGE3)) {
+                        //connection established!
+                        System.out.println ("Hole punch connection established!");
+                        return true;
+                    } else {
+                        //client sent number again
+                        num = fromBytes (buf);
+                    }
+                } else {
+                    sendPacket (remoteIP, remotePort, MESSAGE2);
+                    receivePacket (buf);
 
-                if (Arrays.equals (buf, MESSAGE3)) {
-                    //connection established!
-                    System.out.println ("Hole punch connection established!");
-                    return true;
+                    if (Arrays.equals (buf, MESSAGE3)) {
+                        System.out.println ("Phase 2 established!");
+
+                        //connection established!
+                        System.out.println ("Hole punch connection established!");
+                        return true;
+                    }
                 }
             }
         }
