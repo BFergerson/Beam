@@ -213,6 +213,14 @@ public class BeamClient
         return communicator.send (message);
     }
 
+    public void queueMessage (BeamMessage message) {
+        if (!connected) {
+            throw new CommunicatorException ("Client has not yet been connected!");
+        }
+
+        communicator.queue (message);
+    }
+
     public RSAConnection establishRSAConnection (RSA publicKey) {
         if (!connected) {
             throw new CommunicatorException ("Client has not yet been connected!");
