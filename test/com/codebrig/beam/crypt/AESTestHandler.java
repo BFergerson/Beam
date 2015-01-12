@@ -42,7 +42,7 @@ public class AESTestHandler extends AESBeamHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
         assert (message.get ("aes_test_variable").equals ("aes_test_value"));
         System.out.println ("AES sent message valid!");
 

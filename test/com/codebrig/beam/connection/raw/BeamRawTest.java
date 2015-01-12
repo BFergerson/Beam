@@ -86,7 +86,7 @@ public class BeamRawTest
         {
 
             @Override
-            public BeamMessage messageRecieved (Communicator comm, BasicMessage message) {
+            public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
                 Long channelId = message.getLong ("raw_channel_id");
                 RawDataChannel rawSocket = comm.createRawDataChannel ();
                 rawSocket.connect (channelId);

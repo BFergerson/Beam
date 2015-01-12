@@ -44,10 +44,10 @@ public abstract class BasicHandler extends BeamHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
-        return messageRecieved (comm, new BasicMessage (message));
+    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
+        return messageReceived (comm, new BasicMessage (message));
     }
 
-    public abstract BeamMessage messageRecieved (Communicator comm, BasicMessage message);
+    public abstract BeamMessage messageReceived (Communicator comm, BasicMessage message);
 
 }

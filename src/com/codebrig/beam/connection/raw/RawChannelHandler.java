@@ -61,7 +61,7 @@ public class RawChannelHandler extends SystemHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (SystemCommunicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage message) {
         if (message != null && message.getMessageId () == rawSocket.getRawChannelId ()) {
             RawDataMessage dataMessage = new RawDataMessage (message);
             int blockNum = rawSocket.getNextBlockNumber ();

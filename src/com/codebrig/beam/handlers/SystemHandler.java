@@ -48,10 +48,10 @@ public abstract class SystemHandler extends BeamHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
-        return messageRecieved (new SystemCommunicator (comm), message);
+    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
+        return messageReceived (new SystemCommunicator (comm), message);
     }
 
-    public abstract BeamMessage messageRecieved (final SystemCommunicator comm, final BeamMessage message);
+    public abstract BeamMessage messageReceived (final SystemCommunicator comm, final BeamMessage message);
 
 }

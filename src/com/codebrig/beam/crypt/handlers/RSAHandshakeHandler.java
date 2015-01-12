@@ -55,7 +55,7 @@ public class RSAHandshakeHandler extends SystemHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (SystemCommunicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage message) {
         RSAHandshakeMessage handshake = new RSAHandshakeMessage (message);
         String connectionKey = privateRSA.decrypt (handshake.getConnectionKey ());
         String session = Generator.makeString (50);

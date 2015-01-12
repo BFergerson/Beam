@@ -101,7 +101,7 @@ public abstract class BeamHandler
 
     public final BeamMessage processMessage (final Communicator comm, final BeamMessage message) {
         BeamMessage processedMessage = processIncomingMessage (comm, message);
-        processedMessage = messageRecieved (comm, processedMessage);
+        processedMessage = messageReceived (comm, processedMessage);
 
         if (processedMessage != null) {
             processedMessage = processOutgoingMessage (comm, message, processedMessage);
@@ -125,6 +125,6 @@ public abstract class BeamHandler
         return responseMessage;
     }
 
-    public abstract BeamMessage messageRecieved (final Communicator comm, final BeamMessage message);
+    public abstract BeamMessage messageReceived (final Communicator comm, final BeamMessage message);
 
 }

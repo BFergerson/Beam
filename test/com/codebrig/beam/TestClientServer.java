@@ -85,7 +85,7 @@ public class TestClientServer
         {
 
             @Override
-            public BeamMessage messageRecieved (Communicator comm, BasicMessage message) {
+            public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
                 System.out.println ("Received message from client: " + message.getString ("client_message"));
 
                 //clear and add response

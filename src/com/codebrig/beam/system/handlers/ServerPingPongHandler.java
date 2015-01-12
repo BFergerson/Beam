@@ -214,7 +214,7 @@ public class ServerPingPongHandler extends SystemHandler implements Runnable
     }
 
     @Override
-    public BeamMessage messageRecieved (SystemCommunicator comm, BeamMessage commMessage) {
+    public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage commMessage) {
         if (responders == null) {
             //this guy is too late. ignore
             return null;

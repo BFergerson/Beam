@@ -261,26 +261,26 @@ public class FileTransferChannel
 //            }
             //find out how much we already have here
             long cost;
-            long recievedData = 0;
+            long receivedData = 0;
 
-            while (!stop && recievedData < fileSize) {
+            while (!stop && receivedData < fileSize) {
                 cost = System.currentTimeMillis ();
-                if (recievedData + BUFFER_SIZE > fileSize) {
+                if (receivedData + BUFFER_SIZE > fileSize) {
                     //use a smaller buffer as to not overread!
-                    buffer = new byte[((int) (fileSize - recievedData))];
+                    buffer = new byte[((int) (fileSize - receivedData))];
                 } else {
                     buffer = new byte[BUFFER_SIZE];
                 }
 
                 int size = inputStream.read (buffer);
                 outputFileStream.write (buffer, 0, size);
-                recievedData += size;
+                receivedData += size;
 
                 cost = System.currentTimeMillis () - cost;
                 //update tracker if valid
                 if (tracker != null) {
                     try {
-                        tracker.updateStats (fileSize, recievedData, size, cost);
+                        tracker.updateStats (fileSize, receivedData, size, cost);
                     } catch (Exception ex) {
                         //ignore
                     }

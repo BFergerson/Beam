@@ -165,7 +165,7 @@ class Dispatch
             buf = new byte[1024 * 10000];
             i = mySocket.read (buf, 0, len);
             //String data = new String (buf, 0, i);
-            //System.println (String.format ("Recieved data: [%s]", data));
+            //System.println (String.format ("Received data: [%s]", data));
             client.dataremain -= len;
         }
 
