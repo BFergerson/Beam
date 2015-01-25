@@ -90,7 +90,7 @@ Note: Most messages extends BeamMessage. BasicMessage is being extending in this
 
 ## Sending Messages ##
 
-Sending a message will send a message and block waiting for a response.
+Sending a message will send a message and block while waiting for a response.
 
 To create and send a BasicMessage to the server from client
 ```java
