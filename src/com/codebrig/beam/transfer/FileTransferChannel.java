@@ -29,312 +29,204 @@
  */
 package com.codebrig.beam.transfer;
 
+import com.codebrig.beam.Communicator;
+import com.codebrig.beam.SystemCommunicator;
 import com.codebrig.beam.connection.raw.RawDataChannel;
-import java.io.BufferedInputStream;
+import com.codebrig.beam.handlers.SystemHandler;
+import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.SystemMessageType;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import net.jpountz.lz4.LZ4Factory;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class FileTransferChannel
+public class FileTransferChannel extends SystemHandler
 {
-
-    private final static LZ4Factory factory = LZ4Factory.safeInstance ();
 
     private final static int BUFFER_SIZE = 1024 * 1024; //1MB
     private boolean stop;
+    private final Communicator comm;
     private final RawDataChannel rawChannel;
     private final InputStream inputStream;
     private final OutputStream outStream;
+    private final List<Integer> downloadedBlockSet = new ArrayList<> ();
+    private final Set<FileDataMessage> capturedBlockSet;
+    private int receiveBlockSize = -1;
+    private int receiveBlockCount = -1;
+    private boolean receiveFinished = false;
 
     public FileTransferChannel (RawDataChannel rawChannel) {
+        super (SystemMessageType.FILE_DATA, SystemMessageType.FILE_BURST);
+
         this.rawChannel = rawChannel;
+        rawChannel.getCommunicator ().addHandler (this);
+
+        comm = rawChannel.getCommunicator ();
         inputStream = rawChannel.getInputStream ();
         outStream = rawChannel.getOutputStream ();
 
-        rawChannel.setWaitForResponse (true);
+        capturedBlockSet = Collections.newSetFromMap (new ConcurrentHashMap<FileDataMessage, Boolean> ());
     }
 
-    public void close () {
-        rawChannel.close ();
+    public long sendFile (File file) throws IOException {
+        return sendFile (file, null);
     }
 
-    public long sendFile (String fileName) throws IOException {
-        return sendFile (fileName, 0, null, false);
-    }
-
-    public long sendFile (String fileName, long startPosition) throws IOException {
-        return sendFile (fileName, startPosition, null, false);
-    }
-
-    public long sendFile (String fileName, long startPosition,
-            TransferTracker tracker, boolean compress) throws IOException {
+    public long sendFile (File file, TransferTracker tracker) throws IOException {
         stop = false;
-        byte[] buffer = new byte[BUFFER_SIZE];
-        BufferedInputStream fileStream = null;
+        long fileSize = file.length ();
+        long cost;
         long sentData = 0;
+        HashSet<Integer> neededBlockSet = new HashSet<> ();
 
-        try {
-            File f = new File (fileName);
-            fileStream = new BufferedInputStream (new FileInputStream (f));
-            if (startPosition == 0) {
-                //0 or -1 = start at start!
-                startPosition = -1;
-            }
-            if (startPosition != -1) {
-                if (startPosition == f.length ()) {
-                    //already sent all of it. nothing to do here
-                    return 0;
-                }
-                fileStream.skip (startPosition);
-            }
+        //calculate block ids/sizes
+        int blockSize = BUFFER_SIZE;
+        int blockCount = (int) (fileSize / blockSize);
+        int lastBlockSize = (int) (fileSize % blockSize);
+        if (lastBlockSize != 0) {
+            blockCount++;
+        }
 
-            ByteBuffer buf = ByteBuffer.allocate (20);
+        FileBurstMessage burstMessage = new FileBurstMessage ();
+        burstMessage.setBlockCount (blockCount);
+        burstMessage.setBlockSize (blockSize);
 
-            //no exceptions
-            buf.put (new byte[] {0, 0, 0, 0});
+        for (int i = 0; i < blockCount; i++) {
+            neededBlockSet.add (i);
+        }
 
-            //send if its a resume or not
-            boolean resume = startPosition != -1;
-            if (resume) {
-                buf.put (new byte[] {1, 1, 1, 1});
-            } else {
-                buf.put (new byte[] {0, 0, 0, 0});
-            }
+        //send block ids/sizes
+        BeamMessage responseMessage = comm.send (burstMessage);
+        if (responseMessage == null || !responseMessage.isSuccessful ()) {
+            //throw error
+        }
 
-            //send if its compressed or not
-            if (compress) {
-                buf.put (new byte[] {1, 1, 1, 1});
-            } else {
-                buf.put (new byte[] {0, 0, 0, 0});
-            }
+        try (RandomAccessFile raf = new RandomAccessFile (file, "rw")) {
+            //repeat
+            while (!stop) {
+                //  burst file
+                Integer[] requiredBlocks = neededBlockSet.toArray (new Integer[neededBlockSet.size ()]);
+                for (int blockNumber : requiredBlocks) {
+                    long seekPosition = blockNumber * blockSize;
+                    raf.seek (seekPosition);
 
-            //send file size - start position
-            long fileSize = getFileSize (fileName) - (resume ? startPosition : 0);
-            byte[] fSize = toLongByteArray (fileSize);
-
-            buf.put (fSize);
-            outStream.write (buf.array ());
-            outStream.flush ();
-
-//            if (compress) {
-//                //turn outStream into a LZ4 stream
-//                outStream = new LZ4BlockOutputStream (outStream, 1 << 16, factory.fastCompressor ());
-//            }
-            //send full file
-            int size;
-            long cost;
-
-            if (buffer.length > fileSize) {
-                buffer = new byte[(int) fileSize];
-            }
-
-            while (!stop && (size = fileStream.read (buffer)) > 0) {
-                cost = System.currentTimeMillis ();
-                outStream.write (buffer, 0, size);
-                outStream.flush ();
-                sentData += size;
-
-                cost = (System.currentTimeMillis () - cost);
-                //update tracker
-                if (tracker != null) {
-                    try {
-                        tracker.updateStats (fileSize,
-                                //add start position to sent if resume
-                                sentData + ((resume) ? startPosition : 0),
-                                size, cost);
-                    } catch (Exception e) {
-                        //idc
-                    }
-                }
-
-                if (sentData < fileSize) {
-                    if (sentData + BUFFER_SIZE > fileSize) {
-                        //use a smaller buffer as to not overread!
-                        buffer = new byte[((int) (fileSize - sentData))];
+                    byte[] readBuffer;
+                    if (seekPosition + blockSize > fileSize) {
+                        //use smaller buffer
+                        readBuffer = new byte[lastBlockSize];
                     } else {
-                        buffer = new byte[BUFFER_SIZE];
+                        readBuffer = new byte[blockSize];
                     }
+
+                    raf.read (readBuffer);
+
+                    //send data
+                    FileDataMessage dataMessage = new FileDataMessage (rawChannel.getRemoteRawChannelId ());
+                    dataMessage.setBlockNumber (blockNumber);
+                    dataMessage.setRawData (readBuffer);
+                    comm.queue (dataMessage);
                 }
-            }
 
-            outStream.flush ();
+                burstMessage.clear ();
+                burstMessage.setBurstConfirmationMessage (true);
+                do {
+                    //send burst confirmation
+                    responseMessage = comm.send (burstMessage, 5000);
+                } while (responseMessage == null && !stop); //wait for burst confirmation and request blocks
 
-            if (tracker != null) {
-                tracker.finished ();
-            }
-        } catch (FileNotFoundException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            ex.printStackTrace ();
-
-            return -1;
-        } finally {
-            try {
-                if (fileStream != null) {
-                    fileStream.close ();
+                burstMessage = new FileBurstMessage (responseMessage);
+                if (burstMessage.isBurstComplete ()) {
+                    break; //file finished transferring
+                } else {
+                    neededBlockSet.removeAll (burstMessage.getConfirmedBlockList ());
                 }
-            } catch (IOException ex) {
-                //ignore
             }
         }
 
-//        if (compress) {
-//            return ((LZ4BlockOutputStream) outStream).getActualSentData ();
-//        } else {
-//            return sentData;
-//        }
+        rawChannel.getCommunicator ().removeHandler (this);
         return sentData;
     }
 
-    public boolean receiveFile (RandomAccessFile outputFileStream) throws TransferException, IOException {
-        return receiveFile (outputFileStream, null, false);
+    public boolean receiveFile (File file) throws IOException {
+        return receiveFile (file, null);
     }
 
-    public boolean receiveFile (RandomAccessFile outputFileStream,
-            TransferTracker tracker, boolean decompress) throws TransferException, IOException {
+    public boolean receiveFile (File file, TransferTracker tracker) throws IOException {
         stop = false;
+        long fileSize = file.length ();
+        long cost;
+        long recievedData = 0;
 
-        byte[] buffer = new byte[4];
-        try {
-            //see if we got any exceptions
-            inputStream.read (buffer);
+        //receive/confirm block calculations
+        try (RandomAccessFile raf = new RandomAccessFile (file, "rw")) {
+            while (!stop) {
+                Object[] capturedBlocks = capturedBlockSet.toArray ();
+                for (Object ob : capturedBlocks) {
+                    FileDataMessage dataMessage = (FileDataMessage) ob;
+                    int startPos = dataMessage.getBlockNumber () * receiveBlockSize;
 
-            if (buffer[0] == 1) {
-                //we have an exception! see if we have an error message
-                String message = null;
+                    raf.seek (startPos);
+                    raf.write (dataMessage.getRawData ());
 
-                buffer = new byte[1];
-                inputStream.read (buffer);
-                if (buffer[0] == 1) {
-                    //we have a message. get length
-                    buffer = new byte[4];
-                    inputStream.read (buffer);
-
-                    int messageLen = intFromByteArray (buffer);
-                    buffer = new byte[messageLen];
-                    inputStream.read (buffer);
-
-                    message = new String (buffer, "UTF-8");
+                    capturedBlockSet.remove (dataMessage);
+                    downloadedBlockSet.add (dataMessage.getBlockNumber ());
                 }
 
-                throw new TransferException ("Sender: " + message);
-            }
-
-            //get if resume or not
-            buffer = new byte[4];
-            inputStream.read (buffer);
-            if (buffer[0] == 1) {
-                //append data to the end
-                outputFileStream.seek (outputFileStream.length ());
-            } else {
-                //clean file
-                outputFileStream.setLength (0);
-            }
-
-            //get if compressed or not
-            boolean isCompressed = false;
-            buffer = new byte[4];
-            inputStream.read (buffer);
-            if (buffer[0] == 1) {
-                isCompressed = true;
-            }
-
-            //get filesize
-            byte[] lenBuffer = new byte[8];
-            inputStream.read (lenBuffer);
-            long fileSize = longFromByteArray (lenBuffer);
-
-//            if (isCompressed && decompress) {
-//                //turn inputStream into a LZ4 stream
-//                inputStream = new LZ4BlockInputStream (inputStream, factory.decompressor ());
-//            }
-            //find out how much we already have here
-            long cost;
-            long recievedData = 0;
-
-            while (!stop && recievedData < fileSize) {
-                cost = System.currentTimeMillis ();
-                if (recievedData + BUFFER_SIZE > fileSize) {
-                    //use a smaller buffer as to not overread!
-                    buffer = new byte[((int) (fileSize - recievedData))];
-                } else {
-                    buffer = new byte[BUFFER_SIZE];
+                if (receiveFinished) {
+                    break;
                 }
-
-                int size = inputStream.read (buffer);
-                outputFileStream.write (buffer, 0, size);
-                recievedData += size;
-
-                cost = System.currentTimeMillis () - cost;
-                //update tracker if valid
-                if (tracker != null) {
-                    try {
-                        tracker.updateStats (fileSize, recievedData, size, cost);
-                    } catch (Exception ex) {
-                        //ignore
-                    }
-                }
-            }
-
-            if (tracker != null) {
-                tracker.finished ();
-            }
-        } catch (TransferException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            ex.printStackTrace ();
-
-            return false;
-        } finally {
-            try {
-                if (outputFileStream != null) {
-                    outputFileStream.close ();
-                }
-            } catch (IOException ex) {
-                //ignore
             }
         }
 
-        //if it reached here it either transfered the whole file or it was stopped prematurely.
+        //if it reached here we either transfered the whole file or it was stopped prematurely.
         //if it was stopped it's not good. if it wasn't, it's all good.
+        rawChannel.getCommunicator ().removeHandler (this);
         return !stop;
     }
 
-    public void stop () {
-        this.stop = true;
+    public void close () {
+        stop = true;
+        rawChannel.getCommunicator ().removeHandler (this);
+        rawChannel.close ();
     }
 
-    private long getFileSize (String fileName) {
-        return new File (fileName).length ();
-    }
+    @Override
+    public BeamMessage messageRecieved (SystemCommunicator comm, BeamMessage message) {
+        if (message.getType () == SystemMessageType.FILE_DATA) {
+            capturedBlockSet.add (new FileDataMessage (message));
+        } else {
+            FileBurstMessage burstMessage = new FileBurstMessage (message);
+            if (burstMessage.isBurstConfirmationMessage ()) {
 
-    private byte[] toLongByteArray (long value) {
-        return ByteBuffer.allocate (8).putLong (value).array ();
-    }
+                burstMessage.clear ();
 
-    private long longFromByteArray (byte[] bytes) {
-        return ByteBuffer.wrap (bytes).getLong ();
-    }
+                if (downloadedBlockSet.size () >= receiveBlockCount) {
+                    receiveFinished = true;
+                    burstMessage.setBurstComplete (true);
+                } else {
+                    burstMessage.setConfirmedBlockList (downloadedBlockSet);
+                }
 
-    private int intFromByteArray (byte[] bytes) {
-        return ByteBuffer.wrap (bytes).getInt ();
-    }
+                return burstMessage.setSuccessful (true);
+            } else {
+                receiveBlockCount = burstMessage.getBlockCount ();
+                receiveBlockSize = burstMessage.getBlockSize ();
 
-    private byte[] toIntByteArray (int value) {
-        return ByteBuffer.allocate (4).putInt (value).array ();
+                return burstMessage.setSuccessful (true);
+            }
+        }
+
+        return null;
     }
 
 }

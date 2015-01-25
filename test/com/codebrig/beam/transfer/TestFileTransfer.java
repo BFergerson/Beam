@@ -36,8 +36,8 @@ import com.codebrig.beam.connection.raw.RawDataChannel;
 import com.codebrig.beam.handlers.BasicHandler;
 import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;
+import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -68,7 +68,7 @@ public class TestFileTransfer
 
         rawChannel.connect (message.getLong ("channel_id"));
         FileTransferChannel ftc = new FileTransferChannel (rawChannel);
-        ftc.sendFile ("C:\\temp\\send_file.txt");
+        ftc.sendFile (new File ("C:\\temp\\send_file.txt"));
         ftc.close ();
 
         //and we're done
@@ -104,9 +104,9 @@ public class TestFileTransfer
                 FileTransferChannel fileChannel = new FileTransferChannel (rawChannel);
 
                 try {
-                    fileChannel.receiveFile (new RandomAccessFile ("C:\\temp\\receive_file.txt", "rw"));
+                    fileChannel.receiveFile (new File ("C:\\temp\\receive_file_" + System.currentTimeMillis () + ".txt"));
                     fileChannel.close ();
-                } catch (TransferException | IOException ex) {
+                } catch (IOException ex) {
                     ex.printStackTrace ();
                 }
 

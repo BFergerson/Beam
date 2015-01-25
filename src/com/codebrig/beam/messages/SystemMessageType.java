@@ -79,8 +79,8 @@ public class SystemMessageType implements BeamMessageType
      *
      */
     public static final int RAW_DATA = -8;
-    
-     /**
+
+    /**
      *
      */
     public static final int RAW_DATA_RESEND = -9;
@@ -88,8 +88,19 @@ public class SystemMessageType implements BeamMessageType
     /**
      *
      */
-    public static final int FILE_TRANSFER_CONNECTION = -9;
+    public static final int FILE_TRANSFER_CONNECTION = -10;
 
+    /**
+     *
+     */
+    public static final int FILE_DATA = -11;
+
+    /**
+     *
+     */
+    public static final int FILE_BURST = -12;
+
+    @Override
     public String getName (int messageType) {
         switch (messageType) {
             case BEAM_HANDSHAKE:
@@ -108,8 +119,14 @@ public class SystemMessageType implements BeamMessageType
                 return "RAW_DATA_CONNECTION";
             case RAW_DATA:
                 return "RAW_DATA";
+            case RAW_DATA_RESEND:
+                return "RAW_DATA_RESEND";
             case FILE_TRANSFER_CONNECTION:
                 return "FILE_TRANSFER_CONNECTION";
+            case FILE_DATA:
+                return "FILE_DATA";
+            case FILE_BURST:
+                return "FILE_BURST";
         }
         return null;
     }
