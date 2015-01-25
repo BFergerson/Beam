@@ -1,4 +1,4 @@
-Beam is client/server and peer-to-peer compatible networking library. It provides the ability to create large network systems with with ease using language-independent messaging protocols. With Beam you can create a server to handle many concurrent connections as well as connect clients to each other for P2P connections. Beam provides the ability for P2P connections through UDP hole punching and UPnP. Message serialization is currently performed by Google's Protocol Buffers (MessagePack and others will be available soon). 
+Beam is client/server and peer-to-peer compatible networking library. It provides the ability to create large network systems with ease using language-independent messaging protocols. With Beam you can create a server to handle many concurrent connections as well as connect clients to each other for P2P connections. Beam provides the ability for P2P connections through UDP hole punching and UPnP. Message serialization is currently performed by Google's Protocol Buffers (MessagePack and others will be available soon). 
 
 ## Overview ##
 * Creating a Server
