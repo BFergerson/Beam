@@ -49,7 +49,7 @@ public class ExampleHandler extends BasicHandler
 
 Note: Most handlers extend BeamHandler. BasicHandler is used in this example to allow for easier message manipulation.
 
-Now that you have created a handle you will need to add that handler to the server.
+Now that you have created a handler you will need to add that handler to the server.
 ```java
 server.addHandler (ExampleHandler.class);
 ```
