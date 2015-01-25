@@ -59,8 +59,10 @@ Note: Add handlers to server before starting to ensure it receives all messages.
 
 ## Connecting a Client ##
 
-Starting a server creates a thread to handle incoming connections, reading/writing to the socket, and notifying handlers. 
-Now that we have a server created and listening we will need to connect a client to it
+Starting a server creates a thread to handle incoming connections, reading/writing to the socket, and notifying handlers. Now that we have a server created and listening we will need to connect a client to it.
+
+This code connects a client to a server at 127.0.0.1 on TCP port 45800
+
 ```java
 BeamClient client = new BeamClient (127.0.0.1, 45800);
 client.connect ();
