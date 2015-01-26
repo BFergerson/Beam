@@ -41,6 +41,7 @@ import com.codebrig.beam.system.handlers.ClientPingPongHandler;
 import com.codebrig.beam.system.handlers.HandshakeHandler;
 import com.codebrig.beam.system.handlers.TestConnectionHandler;
 import com.codebrig.beam.system.messages.HandshakeMessage;
+import com.codebrig.beam.transfer.FileTransferChannel;
 import com.codebrig.beam.utils.Generator;
 import com.jcraft.jhttptunnel.JHttpTunnelClient;
 import java.io.BufferedReader;
@@ -676,6 +677,13 @@ public class Communicator implements Runnable
         RawDataChannel rawChannel = new RawDataChannel (new SystemCommunicator (this), rawChannelId);
 
         return rawChannel;
+    }
+
+    public FileTransferChannel createFileTransferChannel () {
+        long rawChannelId = getUnusedMessageId ();
+        FileTransferChannel transferChannel = new FileTransferChannel (new SystemCommunicator (this), rawChannelId);
+
+        return transferChannel;
     }
 
     public BeamMessage fetch (int... responseTypes) {

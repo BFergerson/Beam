@@ -41,10 +41,10 @@ import java.util.Arrays;
 public class FileDataMessage extends SystemMessage
 {
 
-    public FileDataMessage (long rawChannelId) {
+    public FileDataMessage (long transferChannelId) {
         super (SystemMessageType.FILE_DATA);
 
-        setMessageId (rawChannelId);
+        setMessageId (transferChannelId);
     }
 
     public FileDataMessage (BeamMessage message) {

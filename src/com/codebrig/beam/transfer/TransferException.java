@@ -29,10 +29,12 @@
  */
 package com.codebrig.beam.transfer;
 
+import java.io.IOException;
+
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class TransferException extends Exception
+public class TransferException extends IOException
 {
 
     public TransferException (String message) {

@@ -60,16 +60,15 @@ public class TestFileTransfer
         //start client
         BeamClient client = startClient ();
 
-        RawDataChannel rawChannel = client.getCommunicator ().createRawDataChannel ();
+        FileTransferChannel fileChannel = client.getCommunicator ().createFileTransferChannel ();
         BasicMessage message = new BasicMessage (TEST_MESSAGE)
-                .setLong ("channel_id", rawChannel.getRawChannelId ());
+                .setLong ("channel_id", fileChannel.getTransferChannelId ());
         BeamMessage responseMessage = client.getCommunicator ().send (message);
         message = new BasicMessage (responseMessage);
 
-        rawChannel.connect (message.getLong ("channel_id"));
-        FileTransferChannel ftc = new FileTransferChannel (rawChannel);
-        ftc.sendFile (new File ("C:\\temp\\send_file.txt"));
-        ftc.close ();
+        fileChannel.connect (message.getLong ("channel_id"));
+        fileChannel.sendFile (new File ("C:\\temp\\send_file.txt"));
+        fileChannel.close ();
 
         //and we're done
         server.close ();
@@ -94,14 +93,12 @@ public class TestFileTransfer
             @Override
             public BeamMessage messageRecieved (Communicator comm, BasicMessage message) {
                 //user wants to transfer a file. establish file transfer channel
-                RawDataChannel rawChannel = comm.createRawDataChannel ();
-                rawChannel.connect (message.getLong ("channel_id"));
+                FileTransferChannel fileChannel = comm.createFileTransferChannel ();
+                fileChannel.connect (message.getLong ("channel_id"));
 
                 message.clear ();
-                message.setSuccessful (true).setLong ("channel_id", rawChannel.getRawChannelId ());
+                message.setSuccessful (true).setLong ("channel_id", fileChannel.getTransferChannelId ());
                 comm.queue (message);
-
-                FileTransferChannel fileChannel = new FileTransferChannel (rawChannel);
 
                 try {
                     fileChannel.receiveFile (new File ("C:\\temp\\receive_file_" + System.currentTimeMillis () + ".txt"));

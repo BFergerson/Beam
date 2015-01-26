@@ -41,8 +41,10 @@ import java.util.List;
 public class FileBurstMessage extends SystemMessage<FileBurstMessage>
 {
 
-    public FileBurstMessage () {
+    public FileBurstMessage (long transferChannelId) {
         super (SystemMessageType.FILE_BURST);
+
+        setMessageId (transferChannelId);
     }
 
     public FileBurstMessage (BeamMessage message) {
@@ -57,12 +59,28 @@ public class FileBurstMessage extends SystemMessage<FileBurstMessage>
         return getInt ("block_count");
     }
 
+    public FileBurstMessage setBurstSize (int burstSize) {
+        return setInt ("burst_size", burstSize);
+    }
+
+    public int getBurstSize () {
+        return getInt ("burst_size");
+    }
+
     public FileBurstMessage setBlockSize (int blockSize) {
         return setInt ("block_size", blockSize);
     }
 
     public int getBlockSize () {
         return getInt ("block_size");
+    }
+
+    public FileBurstMessage setLastBlockSize (int lastBlockSize) {
+        return setInt ("last_block_size", lastBlockSize);
+    }
+
+    public int getLastBlockSize () {
+        return getInt ("last_block_size");
     }
 
     public FileBurstMessage setBurstConfirmationMessage (boolean burstConfirmation) {
