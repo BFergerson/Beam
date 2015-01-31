@@ -194,14 +194,17 @@ public class FileTransferChannel extends SystemHandler
                     }
 
                     if (tracker != null) {
-                        try {
-                            tracker.updateStats (fileSize, sentData, (int) (sentData - totalSentData), endTime);
-                        } catch (Exception ex) {
-                            ex.printStackTrace ();
+                        int sentDelta = (int) (sentData - totalSentData);
+                        if (sentDelta != 0) {
+                            try {
+                                tracker.updateStats (fileSize, sentData, sentDelta, endTime);
+                            } catch (Exception ex) {
+                                ex.printStackTrace ();
+                            }
+
+                            totalSentData = sentData;
                         }
                     }
-
-                    totalSentData = sentData;
                 }
             }
         }
