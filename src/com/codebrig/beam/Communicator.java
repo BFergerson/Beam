@@ -62,7 +62,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -112,8 +111,7 @@ public class Communicator implements Runnable
     private boolean userClosed = false;
     private final ArrayList<Communicator> derivedCommunicators;
     private boolean openStreamFailure = false;
-    private boolean outputStreamContent = false;
-    private boolean outputMessageTypeData = false;
+    private boolean debugOutput = false;
     private boolean performingHandshake = false;
     private boolean handshakeComplete = false;
     private JHttpTunnelClient tunnelClient;
@@ -484,7 +482,7 @@ public class Communicator implements Runnable
             msg.setRecievedTimestamp (System.currentTimeMillis ());
         }
 
-        if (outputMessageTypeData) {
+        if (debugOutput) {
             if (msg.isSystemMessage ()) {
                 System.out.println (String.format ("Received message: %s - Size: %s",
                         systemMessageType.getName (msg.getType ()), msg.getSize ()));
@@ -518,11 +516,6 @@ public class Communicator implements Runnable
 
             sent += buffer.length;
         }
-
-        if (outputStreamContent) {
-            System.out.println (String.format ("Wrote: Data:%s; String: %s",
-                    Arrays.toString (data), new String (data, "UTF-8")));
-        }
     }
 
     public byte[] readStream (int length) throws IOException {
@@ -547,11 +540,6 @@ public class Communicator implements Runnable
                 buf.put (buffer, 0, read);
                 recieved += read;
             }
-        }
-
-        if (outputStreamContent) {
-            System.out.println (String.format ("Read: Data: %s; String: %s",
-                    Arrays.toString (buf.array ()), new String (buf.array (), "UTF-8")));
         }
 
         return buf.array ();
@@ -609,7 +597,7 @@ public class Communicator implements Runnable
 
                 writeStream (headerWithData);
 
-                if (outputMessageTypeData) {
+                if (debugOutput) {
                     if (msg.isSystemMessage ()) {
                         System.out.println (String.format ("Sent message: %s - Size: %s",
                                 systemMessageType.getName (msg.getType ()), msg.getSize ()));
@@ -994,12 +982,12 @@ public class Communicator implements Runnable
         }
     }
 
-    public void setOutputMessageTypeData (boolean outputMessageTypeData) {
-        this.outputMessageTypeData = outputMessageTypeData;
+    public void setDebugOutput (boolean debugOutput) {
+        this.debugOutput = debugOutput;
     }
 
-    public boolean isOutputMessageTypeData () {
-        return outputMessageTypeData;
+    public boolean isDebugOutput () {
+        return debugOutput;
     }
 
     public void setAttribute (String name, Object objectToStore) {

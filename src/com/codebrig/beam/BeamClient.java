@@ -83,6 +83,7 @@ public class BeamClient
 
     private Communicator communicator;
     private boolean connected = false;
+    private boolean debugOutput;
 
     public BeamClient (String host, int port) {
         this (host, null, port, true);
@@ -167,6 +168,7 @@ public class BeamClient
             }
         }
 
+        communicator.setDebugOutput (debugOutput);
         communicator.performBeamHandshake ();
         connected = true;
     }
@@ -246,6 +248,18 @@ public class BeamClient
         }
 
         return null;
+    }
+
+    public void setDebugOutput (boolean debugOutput) {
+        this.debugOutput = debugOutput;
+        
+        if (communicator != null) {
+            communicator.setDebugOutput (debugOutput);
+        }
+    }
+
+    public boolean isDebugOutput () {
+        return debugOutput;
     }
 
     private static class AuthenticatorImpl extends Authenticator
