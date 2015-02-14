@@ -112,6 +112,7 @@ public class BeamServer extends Thread
     private static int serverUID = 0;
     private long bootTime = -1;
     private BeamMessageType messageType;
+    private boolean debugOutput;
 
     private ConnectionType.Incoming[] incomingConnectionTypes = new ConnectionType.Incoming[] {
         ConnectionType.Incoming.DIRECT
@@ -195,6 +196,7 @@ public class BeamServer extends Thread
                 Socket socket = serverSocket.accept ();
                 final Communicator comm = new Communicator (socket, serverName, true);
                 comm.setMessageType (messageType);
+                comm.setDebugOutput (debugOutput);
 
                 for (HandlerCapsule pass : handlers) {
                     final Class<?> theClass = pass.getClassFile ();
@@ -372,6 +374,14 @@ public class BeamServer extends Thread
 
     public long getBootTime () {
         return bootTime;
+    }
+
+    public void setDebugOutput (boolean debugOutput) {
+        this.debugOutput = debugOutput;
+    }
+
+    public boolean isDebugOutput () {
+        return debugOutput;
     }
 
     private class HandlerCapsule

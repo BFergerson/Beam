@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014-2015 CodeBrig, LLC.
+ * Copyright (c) 2014-2015 CodeBrig, LLC.
  * http://www.codebrig.com/
  *
  * Beam - Client/Server & P2P Networking Library
@@ -27,18 +27,3 @@
  *
  * ====
  */
-package com.codebrig.beam.transfer;
-
-import java.io.IOException;
-
-/**
- * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
- */
-public class TransferException extends IOException
-{
-
-    public TransferException (String message) {
-        super (message);
-    }
-
-}

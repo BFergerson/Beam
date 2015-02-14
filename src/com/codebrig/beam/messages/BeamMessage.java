@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -611,6 +612,45 @@ public class BeamMessage<T extends BeamMessage>
         }
 
         return header.array ();
+    }
+
+    @Override
+    public int hashCode () {
+        int hash = 3;
+        hash = 59 * hash + (this.systemMessage ? 1 : 0);
+        hash = 59 * hash + this.type;
+        hash = 59 * hash + Arrays.hashCode (this.data);
+        hash = 59 * hash + Objects.hashCode (this.messageMap);
+        hash = 59 * hash + (this.rawData ? 1 : 0);
+        hash = 59 * hash + (int) (this.messageId ^ (this.messageId >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals (Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass () != obj.getClass ()) {
+            return false;
+        }
+        final BeamMessage<?> other = (BeamMessage<?>) obj;
+        if (this.systemMessage != other.systemMessage) {
+            return false;
+        }
+        if (this.type != other.type) {
+            return false;
+        }
+        if (!Arrays.equals (this.data, other.data)) {
+            return false;
+        }
+        if (!Objects.equals (this.messageMap, other.messageMap)) {
+            return false;
+        }
+        if (this.rawData != other.rawData) {
+            return false;
+        }
+        return this.messageId == other.messageId;
     }
 
 }
