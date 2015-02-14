@@ -267,7 +267,7 @@ public class FileTransferChannel extends SystemHandler
     }
 
     @Override
-    public BeamMessage messageRecieved (SystemCommunicator comm, BeamMessage message) {
+    public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage message) {
         if (message.getMessageId () != transferChannelId) {
             //message is not for me
             return null;
