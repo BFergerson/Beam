@@ -32,7 +32,6 @@ package com.codebrig.beam.transfer;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.connection.raw.RawDataChannel;
 import com.codebrig.beam.handlers.BasicHandler;
 import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;
