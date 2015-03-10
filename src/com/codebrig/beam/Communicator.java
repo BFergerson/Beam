@@ -100,13 +100,13 @@ public class Communicator implements Runnable
     private long uid;
     private Thread commThread;
     private boolean serverCommunicator;
-    private HashMap<String, Object> attributes = new HashMap<String, Object> ();
+    private HashMap<String, Object> attributes = new HashMap<> ();
     private final ArrayList<ShutdownListener> shutdownListeners;
     private final List<BeamMessage> unhandledMessages;
     private final ArrayList<ConnectionStateListener> statusListeners;
     private String communicatorName;
     private volatile boolean claimed;
-    private Queue<BeamMessage> queue = new LinkedList<BeamMessage> ();
+    private Queue<BeamMessage> queue = new LinkedList<> ();
     private boolean testingConnection = false;
     private boolean userClosed = false;
     private final ArrayList<Communicator> derivedCommunicators;
@@ -142,14 +142,14 @@ public class Communicator implements Runnable
             openStreamFailure = true;
         }
 
-        immediateHandlers = new ArrayList<ImmediateHandler> ();
-        systemHandlers = new ArrayList<BeamHandler> ();
-        handlers = new ArrayList<BeamHandler> ();
-        registeredHandlerIDs = new HashSet<Integer> ();
-        unhandledMessages = new CopyOnWriteArrayList<BeamMessage> ();
-        statusListeners = new ArrayList<ConnectionStateListener> ();
-        shutdownListeners = new ArrayList<ShutdownListener> ();
-        derivedCommunicators = new ArrayList<Communicator> ();
+        immediateHandlers = new ArrayList<> ();
+        systemHandlers = new ArrayList<> ();
+        handlers = new ArrayList<> ();
+        registeredHandlerIDs = new HashSet<> ();
+        unhandledMessages = new CopyOnWriteArrayList<> ();
+        statusListeners = new ArrayList<> ();
+        shutdownListeners = new ArrayList<> ();
+        derivedCommunicators = new ArrayList<> ();
 
         attachSystemHandlers ();
 
@@ -174,14 +174,14 @@ public class Communicator implements Runnable
             in = new DataInputStream (tunnelClient.getInputStream ());
         }
 
-        immediateHandlers = new ArrayList<ImmediateHandler> ();
-        systemHandlers = new ArrayList<BeamHandler> ();
-        handlers = new ArrayList<BeamHandler> ();
-        registeredHandlerIDs = new HashSet<Integer> ();
-        unhandledMessages = new CopyOnWriteArrayList<BeamMessage> ();
-        statusListeners = new ArrayList<ConnectionStateListener> ();
-        shutdownListeners = new ArrayList<ShutdownListener> ();
-        derivedCommunicators = new ArrayList<Communicator> ();
+        immediateHandlers = new ArrayList<> ();
+        systemHandlers = new ArrayList<> ();
+        handlers = new ArrayList<> ();
+        registeredHandlerIDs = new HashSet<> ();
+        unhandledMessages = new CopyOnWriteArrayList<> ();
+        statusListeners = new ArrayList<> ();
+        shutdownListeners = new ArrayList<> ();
+        derivedCommunicators = new ArrayList<> ();
 
         attachSystemHandlers ();
 
@@ -617,18 +617,22 @@ public class Communicator implements Runnable
     }
 
     public BeamMessage send (BeamMessage msg) {
-        return send (msg, waitTime (), msg.getType ());
+        return send (msg, waitTime ());
     }
 
     public BeamMessage send (BeamMessage msg, int waitTime) {
-        return send (msg, waitTime, msg.getType ());
+        return send (msg, waitTime, 0);
     }
 
-    public BeamMessage send (BeamMessage msg, int waitTime, int... responseTypes) {
-        return send0 (msg, waitTime, responseTypes);
+    public BeamMessage send (BeamMessage msg, int waitTime, int retryCount) {
+        return send (msg, waitTime, retryCount, new int[] {msg.getType ()});
     }
 
-    private BeamMessage send0 (BeamMessage msg, int waitTime, int... responseTypes) {
+    public BeamMessage send (BeamMessage msg, int waitTime, int retryCount, int... responseTypes) {
+        return send0 (msg, waitTime, retryCount, responseTypes);
+    }
+
+    private BeamMessage send0 (BeamMessage msg, int waitTime, int retryCount, int... responseTypes) {
         if (msg == null) {
             return null;
         }
@@ -637,24 +641,32 @@ public class Communicator implements Runnable
             msg.setMessageId (getUnusedMessageId ());
         }
 
-        //add ImmediateListener first
-        final ImmediateHandler listen = new ImmediateHandler (
-                msg.getMessageId (), msg.isSystemMessage (), waitTime, responseTypes);
-        immediateHandlers.add (listen);
+        BeamMessage rtnMsg = null;
+        for (int i = -1; i < retryCount; retryCount++) {
+            //add ImmediateListener first
+            final ImmediateHandler listen = new ImmediateHandler (
+                    msg.getMessageId (), msg.isSystemMessage (), waitTime, responseTypes);
+            immediateHandlers.add (listen);
 
-        //queue out msg
-        queue (msg);
+            //queue out msg
+            queue (msg);
 
-        //wait for response
-        BeamMessage rtnMsg = listen.waitForMessage ();
+            //wait for response
+            rtnMsg = listen.waitForMessage ();
 
-        //now remove and return
-        immediateHandlers.remove (listen);
+            //now remove and return
+            immediateHandlers.remove (listen);
 
-        if (rtnMsg != null && msg instanceof EncryptedBeamMessage) {
-            //use encryption method in msg to decrypt rtnMsg
-            EncryptedBeamMessage encryptedMessage = (EncryptedBeamMessage) msg;
-            rtnMsg = encryptedMessage.decryptBeamMessage (rtnMsg);
+            if (rtnMsg != null) {
+                if (msg instanceof EncryptedBeamMessage) {
+                    //use encryption method in msg to decrypt rtnMsg
+                    EncryptedBeamMessage encryptedMessage = (EncryptedBeamMessage) msg;
+                    rtnMsg = encryptedMessage.decryptBeamMessage (rtnMsg);
+                }
+
+                //got return message
+                break;
+            }
         }
 
         return rtnMsg;
@@ -684,7 +696,7 @@ public class Communicator implements Runnable
         int index = 0;
         boolean found = false;
 
-        for (BeamMessage msg : unhandledMessages) {
+        for (BeamMessage msg : getUnhandledMessages ()) {
             for (int type : responseTypes) {
                 if (msg.getType () == type) {
                     found = true;
@@ -718,7 +730,7 @@ public class Communicator implements Runnable
             boolean inUse = false;
 
             //ensure message id isn't in use
-            List<ImmediateHandler> handlerList = new ArrayList<ImmediateHandler> (immediateHandlers);
+            List<ImmediateHandler> handlerList = new ArrayList<> (immediateHandlers);
             for (ImmediateHandler handler : handlerList) {
                 if (handler.acceptsMessageId (messageId)) {
                     inUse = true;
@@ -735,17 +747,14 @@ public class Communicator implements Runnable
     }
 
     public void clearUnhandledMessages (int... messageTypes) {
-        ArrayList<BeamMessage> messages = new ArrayList<BeamMessage> ();
-        for (BeamMessage msg : unhandledMessages) {
+        for (BeamMessage msg : getUnhandledMessages ()) {
             for (int type : messageTypes) {
                 if (msg.getType () == type) {
-                    messages.add (msg);
+                    unhandledMessages.remove (msg);
                     break;
                 }
             }
         }
-
-        unhandledMessages.removeAll (messages);
     }
 
     public BeamMessage fetchWithWait (int waitTime, int... responseTypes) {
@@ -955,7 +964,7 @@ public class Communicator implements Runnable
     }
 
     public List<BeamMessage> getUnhandledMessages () {
-        return new ArrayList<BeamMessage> (unhandledMessages);
+        return new ArrayList<> (unhandledMessages);
     }
 
     public boolean isRunning () {
@@ -1221,9 +1230,11 @@ public class Communicator implements Runnable
                     }
 
                     //check unhandled messages just in case its in there
-                    for (BeamMessage msg : unhandledMessages) {
-                        if (acceptsType (msg.getType ())) {
-                            return msg; //todo: remove from unhandled
+                    for (BeamMessage msg : getUnhandledMessages ()) {
+                        if ((responseMessageId == -1 && acceptsType (msg.getType ()))
+                                || (responseMessageId != -1 && acceptsMessageId (msg.getMessageId ()))) {
+                            Communicator.this.unhandledMessages.remove (msg);
+                            return msg;
                         }
                     }
                 } catch (InterruptedException ex) {
@@ -1236,8 +1247,19 @@ public class Communicator implements Runnable
 
         @Override
         public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage msg) {
-            message = msg;
-            isWaiting = false;
+            if (responseMessageId == -1) {
+                //accept any message of matching message type
+                message = msg;
+                isWaiting = false;
+            } else if (acceptsMessageId (msg.getMessageId ())) {
+                //accept any message of matching response id
+                message = msg;
+                isWaiting = false;
+            } else {
+                //we may be looking for this type of message type but response id isn't for us;
+                //add unhandled and continue
+                Communicator.this.unhandledMessages.add (msg);
+            }
 
             return null; //no response
         }
@@ -1250,11 +1272,6 @@ public class Communicator implements Runnable
             return responseMessageId == messageId;
         }
 
-//        @Override
-//        public boolean acceptsType (int type)
-//        {
-//            return true;
-//        }
     }
 
     private byte[] toBytes (int value) {
