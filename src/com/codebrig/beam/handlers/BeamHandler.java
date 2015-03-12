@@ -64,10 +64,14 @@ public abstract class BeamHandler
         this.types = types;
     }
 
-    public boolean acceptsType (final int type) {
-        for (int i = 0; i < types.length; i++) {
-            if (types[i] == type) {
-                return true;
+    public boolean acceptsType (final int... type) {
+        if (type != null) {
+            for (int i = 0; i < types.length; i++) {
+                for (int z = 0; z < type.length; z++) {
+                    if (types[i] == type[z]) {
+                        return true;
+                    }
+                }
             }
         }
 

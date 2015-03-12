@@ -296,6 +296,10 @@ public class BeamServer extends Thread
         handlers.add (new HandlerCapsule (type, passObject));
     }
 
+    public void clearHandlers () {
+        handlers.clear ();
+    }
+
     public void removeHandler (Class<? extends BeamHandler> type) {
         handlers.remove (new HandlerCapsule (type, null));
     }

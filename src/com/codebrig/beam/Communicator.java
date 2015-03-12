@@ -435,8 +435,16 @@ public class Communicator implements Runnable
     private boolean checkValid (BeamHandler listener) {
         for (int type : listener.getTypes ()) {
             if (registeredHandlerIDs.contains (type)) {
-                System.out.println (String.format (
-                        "Communicator has listener registered for: %s", type));
+                if (type < 0) {
+                    System.out.println (String.format (
+                            "Communicator already has listener registered for: %s", systemMessageType.getName (type)));
+                } else if (messageType != null && messageType.getName (type) != null) {
+                    System.out.println (String.format (
+                            "Communicator already has listener registered for: %s", messageType.getName (type)));
+                } else {
+                    System.out.println (String.format (
+                            "Communicator already has listener registered for: %s", type));
+                }
 
                 return false;
             }
@@ -948,7 +956,7 @@ public class Communicator implements Runnable
                     "Unable to find handler for system message: %s", systemMessageType.getName (message.getType ())));
         } else if (messageType != null) {
             String type = messageType.getName (message.getType ());
-            if (type == null) {
+            if (type != null) {
                 System.out.println (String.format (
                         "Unable to find handler for message: %s", type));
             } else {
