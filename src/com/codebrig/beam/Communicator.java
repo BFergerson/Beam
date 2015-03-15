@@ -1255,7 +1255,10 @@ public class Communicator implements Runnable
 
         @Override
         public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage msg) {
-            if (responseMessageId == -1) {
+            if (msg == null) {
+                //alert message. need to finish
+                isWaiting = false;
+            } else if (responseMessageId == -1) {
                 //accept any message of matching message type
                 message = msg;
                 isWaiting = false;
