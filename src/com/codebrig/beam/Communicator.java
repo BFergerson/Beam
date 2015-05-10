@@ -61,6 +61,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -492,11 +493,11 @@ public class Communicator implements Runnable
 
         if (debugOutput) {
             if (msg.isSystemMessage ()) {
-                System.out.println (String.format ("Received message: %s - Size: %s",
-                        systemMessageType.getName (msg.getType ()), msg.getSize ()));
+                System.out.println (String.format ("Received message: %s - Size: %s - Timestamp: %s",
+                        systemMessageType.getName (msg.getType ()), msg.getSize (), new Timestamp (System.currentTimeMillis ())));
             } else if (messageType != null) {
-                System.out.println (String.format ("Received message: %s - Size: %s",
-                        messageType.getName (msg.getType ()), msg.getSize ()));
+                System.out.println (String.format ("Received message: %s - Size: %s - Timestamp: %s",
+                        messageType.getName (msg.getType ()), msg.getSize (), new Timestamp (System.currentTimeMillis ())));
             }
         }
 
@@ -589,7 +590,7 @@ public class Communicator implements Runnable
         return header.array ();
     }
 
-    private void send0 (BeamMessage msg) {
+    private void send0 (BeamMessage msg, boolean outputException) {
         if (msg == null) {
             throw new NullPointerException ();
         }
@@ -607,16 +608,18 @@ public class Communicator implements Runnable
 
                 if (debugOutput) {
                     if (msg.isSystemMessage ()) {
-                        System.out.println (String.format ("Sent message: %s - Size: %s",
-                                systemMessageType.getName (msg.getType ()), msg.getSize ()));
+                        System.out.println (String.format ("Sent message: %s - Size: %s - Timestamp: %s",
+                                systemMessageType.getName (msg.getType ()), msg.getSize (), new Timestamp (System.currentTimeMillis ())));
                     } else if (messageType != null) {
-                        System.out.println (String.format ("Sent message: %s - Size: %s",
-                                messageType.getName (msg.getType ()), msg.getSize ()));
+                        System.out.println (String.format ("Sent message: %s - Size: %s - Timestamp: %s",
+                                messageType.getName (msg.getType ()), msg.getSize (), new Timestamp (System.currentTimeMillis ())));
                     }
                 }
             }
         } catch (IOException ex) {
-            ex.printStackTrace ();
+            if (outputException) {
+                ex.printStackTrace ();
+            }
         }
 
         if (tunnelClient != null) {
@@ -797,7 +800,7 @@ public class Communicator implements Runnable
      */
     public void queue (BeamMessage msg) {
         if (msg != null) {
-            send0 (msg);
+            send0 (msg, true);
         }
     }
 
@@ -1027,7 +1030,7 @@ public class Communicator implements Runnable
             if (!socket.isOutputShutdown ()) {
                 final BeamMessage closeMsg
                         = new SystemMessage (SystemMessageType.CLOSE_CONNECTION);
-                queue (closeMsg);
+                send0 (closeMsg, false); //same as queue without exception output
             }
 
             //send null (a.k.a alert) to any waiting listeners
