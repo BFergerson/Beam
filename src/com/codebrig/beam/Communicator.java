@@ -110,7 +110,6 @@ public class Communicator implements Runnable
     private Queue<BeamMessage> queue = new LinkedList<> ();
     private boolean testingConnection = false;
     private boolean userClosed = false;
-    private final ArrayList<Communicator> derivedCommunicators;
     private boolean openStreamFailure = false;
     private boolean debugOutput = false;
     private boolean performingHandshake = false;
@@ -150,7 +149,6 @@ public class Communicator implements Runnable
         unhandledMessages = new CopyOnWriteArrayList<> ();
         statusListeners = new ArrayList<> ();
         shutdownListeners = new ArrayList<> ();
-        derivedCommunicators = new ArrayList<> ();
 
         attachSystemHandlers ();
 
@@ -182,7 +180,6 @@ public class Communicator implements Runnable
         unhandledMessages = new CopyOnWriteArrayList<> ();
         statusListeners = new ArrayList<> ();
         shutdownListeners = new ArrayList<> ();
-        derivedCommunicators = new ArrayList<> ();
 
         attachSystemHandlers ();
 
@@ -1053,23 +1050,6 @@ public class Communicator implements Runnable
             postConnection ();
         }
     }
-//
-//    public void closeAll ()
-//    {
-//        for (Communicator comm : derivedCommunicators) {
-//            comm.close ();
-//        }
-//    }
-//
-//    public Communicator deriveCommunicator ()
-//    {
-//        return null;
-//    }
-//
-//    public List<Communicator> getDerivedCommunicators ()
-//    {
-//        return new ArrayList<Communicator> (derivedCommunicators);
-//    }
 
     public void shutdownNotice (String message) {
         if (!serverCommunicator) {
