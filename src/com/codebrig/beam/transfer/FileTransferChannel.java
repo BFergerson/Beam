@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -49,8 +50,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FileTransferChannel extends SystemHandler
 {
 
-    private final static int BUFFER_SIZE = 1024 * 1024 * 5; //5MB
-    private final static int DEFAULT_BURST_SIZE = 10; //50MB
+    private static final Logger log = Logger.getLogger (FileTransferChannel.class.getName ());
+
+    private final static int BUFFER_SIZE = 1024 * 1024; //1MB
+    private final static int DEFAULT_BURST_SIZE = 10; //10MB
 
     private boolean stop = false;
     private boolean connected = false;
@@ -131,6 +134,9 @@ public class FileTransferChannel extends SystemHandler
             neededBlockSet.add (i);
         }
 
+        log.finest (String.format ("Sending file: %s ; Burst size: %s, Block count %s, Block size: %s, Last block size: %s",
+                file.getPath (), burstSize, blockCount, blockSize, lastBlockSize));
+
         //send block ids/sizes
         BeamMessage responseMessage = comm.getCommunicator ().send (burstMessage);
         if (responseMessage == null || !responseMessage.isSuccessful ()) {
@@ -138,6 +144,9 @@ public class FileTransferChannel extends SystemHandler
         }
 
         long cost = System.currentTimeMillis ();
+        int totalDataSent = 0;
+        Set<Integer> countedBlockSet = new HashSet<> ();
+
         try (RandomAccessFile raf = new RandomAccessFile (file, "r")) {
             //repeat
             while (!stop) {
@@ -145,6 +154,8 @@ public class FileTransferChannel extends SystemHandler
                 int burstCount = 0;
                 Integer[] requiredBlocks = neededBlockSet.toArray (new Integer[neededBlockSet.size ()]);
                 for (int blockNumber : requiredBlocks) {
+                    long startTime = System.currentTimeMillis ();
+
                     long seekPosition = (long) blockNumber * (long) blockSize;
                     raf.seek (seekPosition);
 
@@ -162,19 +173,53 @@ public class FileTransferChannel extends SystemHandler
                     FileDataMessage dataMessage = new FileDataMessage (remoteTransferChannelId);
                     dataMessage.setBlockNumber (blockNumber);
                     dataMessage.setRawData (readBuffer);
+
+                    log.finest (String.format ("Sending - FileDataMessage; Block number: %s, Block size: %s",
+                            blockNumber, dataMessage.getData ().length));
+
                     comm.getCommunicator ().queue (dataMessage);
+                    long endTime = System.currentTimeMillis ();
+
+                    long costTime = endTime - startTime;
+                    int dataSent = dataMessage.getSize ();
+
+                    //theoretical sent data tracker
+                    if (tracker != null) {
+                        if (dataSent != 0 && !countedBlockSet.contains (dataMessage.getBlockNumber ())) {
+                            totalDataSent += dataSent;
+
+                            try {
+                                tracker.updateStats (fileSize, totalDataSent, dataSent, costTime);
+                            } catch (Exception ex) {
+                                ex.printStackTrace ();
+                            }
+
+                            countedBlockSet.add (dataMessage.getBlockNumber ());
+                        }
+                    }
+
                     burstCount++;
+
+                    log.finest (String.format ("Sent - FileDataMessage; Block number: %s, Block size: %s",
+                            blockNumber, dataMessage.getData ().length));
 
                     if (burstCount >= burstSize && burstCount != 0) {
                         break;
                     }
                 }
 
+                //sleep awhile incase data message hasn't finished flushing
+                try {
+                    Thread.sleep (100);
+                } catch (InterruptedException ex) {
+                }
+
                 burstMessage.clear ();
                 burstMessage.setBurstConfirmationMessage (true);
                 do {
                     //send burst confirmation
-                    responseMessage = comm.getCommunicator ().send (burstMessage, 5000);
+                    log.finest ("Sent - FileBurstMessage; isBurstConfirmationMessage: true");
+                    responseMessage = comm.getCommunicator ().send (burstMessage, 2500);
                 } while (responseMessage == null && !stop); //wait for burst confirmation and request blocks
 
                 long endTime = System.currentTimeMillis () - cost;
@@ -191,8 +236,11 @@ public class FileTransferChannel extends SystemHandler
                             sentData += blockSize;
                         }
                         neededBlockSet.remove (blockNum);
+
+                        log.finest (String.format ("Sucessfully sent block: %s, Block size: %s", blockNum, blockSize));
                     }
 
+                    //confirmed sent data tracker
                     if (tracker != null) {
                         int sentDelta = (int) (sentData - totalSentData);
                         if (sentDelta != 0) {
@@ -209,6 +257,8 @@ public class FileTransferChannel extends SystemHandler
             }
         }
 
+        log.finest (String.format ("Finished sending file: %s ; Total data sent: %s", file.getPath (), totalSentData));
+
         comm.getCommunicator ().removeHandler (this);
         return totalSentData;
     }
@@ -222,17 +272,32 @@ public class FileTransferChannel extends SystemHandler
             throw new TransferException ("File transfer channel is not connected!");
         }
 
+        log.finest (String.format ("Receiving file: %s", file.getPath ()));
+
         stop = false;
         long fileSize = file.length ();
         long cost = System.currentTimeMillis ();
         long recievedData = 0;
+        int lastOutputSize = 0;
 
         try (RandomAccessFile raf = new RandomAccessFile (file, "rw")) {
             while (!stop) {
-                Object[] capturedBlocks = capturedBlockSet.toArray ();
-                for (Object ob : capturedBlocks) {
-                    FileDataMessage dataMessage = (FileDataMessage) ob;
+                FileDataMessage[] capturedBlocks = capturedBlockSet.toArray (
+                        new FileDataMessage[capturedBlockSet.size ()]);
+
+                if (capturedBlocks.length > 0) {
+                    int[] captured = new int[capturedBlocks.length];
+                    for (int i = 0; i < captured.length; i++) {
+                        captured[i] = capturedBlocks[i].getBlockNumber ();
+                    }
+                    log.finest (String.format ("Captured blocks: %s", Arrays.toString (captured)));
+                }
+
+                for (FileDataMessage dataMessage : capturedBlocks) {
                     long startPos = (long) dataMessage.getBlockNumber () * (long) receiveBlockSize;
+
+                    log.finest (String.format ("Parsing FileDataMessage; Block number: %s, File write position: %s",
+                            dataMessage.getBlockNumber (), startPos));
 
                     byte[] rawData = dataMessage.getRawData ();
                     raf.seek (startPos);
@@ -254,11 +319,18 @@ public class FileTransferChannel extends SystemHandler
                     cost = System.currentTimeMillis ();
                 }
 
+                if (!downloadedBlockSet.isEmpty () && lastOutputSize < downloadedBlockSet.size ()) {
+                    lastOutputSize = downloadedBlockSet.size ();
+                    log.finest (String.format ("Downloaded blocks: %s", Arrays.toString (downloadedBlockSet.toArray ())));
+                }
+
                 if (receiveFinished) {
                     break;
                 }
             }
         }
+
+        log.finest (String.format ("Finished receiving file: %s ; Total data received: %s", file.getPath (), recievedData));
 
         //if it reached here we either transfered the whole file or it was stopped prematurely.
         //if it was stopped it's not good. if it wasn't, it's all good.
@@ -269,12 +341,17 @@ public class FileTransferChannel extends SystemHandler
     @Override
     public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage message) {
         if (message.getMessageId () != transferChannelId) {
+            log.finest (String.format ("Ignored invalid message; Message id: %s, Message type: %s",
+                    message.getMessageId (), message.getType ()));
             //message is not for me
             return null;
         }
 
         if (message.getType () == SystemMessageType.FILE_DATA) {
-            capturedBlockSet.add (new FileDataMessage (message));
+            FileDataMessage fdm = new FileDataMessage (message);
+            log.finest (String.format ("Received - FileDataMessage; Block number: %s, Block size: %s",
+                    fdm.getBlockNumber (), fdm.getRawData ().length));
+            capturedBlockSet.add (fdm);
         } else {
             FileBurstMessage burstMessage = new FileBurstMessage (message);
             if (burstMessage.isBurstConfirmationMessage ()) {
@@ -289,6 +366,9 @@ public class FileTransferChannel extends SystemHandler
                     burstMessage.setConfirmedBlockList (confirmedList);
                 }
 
+                log.finest (String.format ("Received - FileBurstMessage; isBurstConfirmationMessage: true, Confirmed block list size: %s",
+                        burstMessage.getConfirmedBlockList ().size ()));
+
                 return burstMessage.setSuccessful (true);
             } else {
                 //receive/confirm block calculations
@@ -296,6 +376,9 @@ public class FileTransferChannel extends SystemHandler
                 receiveBlockCount = burstMessage.getBlockCount ();
                 receiveBlockSize = burstMessage.getBlockSize ();
                 receiveLastBlockSize = burstMessage.getLastBlockSize ();
+
+                log.finest (String.format ("Received - FileBurstMessage; Burst size: %s, Block count %s, Block size: %s, Last block size: %s",
+                        receiveBurstSize, receiveBlockCount, receiveBlockSize, receiveLastBlockSize));
 
                 return burstMessage.setSuccessful (true);
             }
