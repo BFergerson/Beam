@@ -650,7 +650,7 @@ public class Communicator implements Runnable
         }
 
         BeamMessage rtnMsg = null;
-        for (int i = -1; i < retryCount; retryCount++) {
+        for (int i = -1; i < retryCount; i++) {
             //add ImmediateListener first
             final ImmediateHandler listen = new ImmediateHandler (
                     msg.getMessageId (), msg.isSystemMessage (), waitTime, responseTypes);
@@ -1210,7 +1210,7 @@ public class Communicator implements Runnable
         }
 
         public BeamMessage waitForMessage () {
-            while (isWaiting) {
+            while (isWaiting && running) {
                 try {
                     Thread.sleep (250);
                     if (!waitForever) {
