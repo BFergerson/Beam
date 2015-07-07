@@ -218,8 +218,12 @@ public class FileTransferChannel extends SystemHandler
                 burstMessage.setBurstConfirmationMessage (true);
                 do {
                     //send burst confirmation
-                    log.finest ("Sent - FileBurstMessage; isBurstConfirmationMessage: true");
                     responseMessage = comm.getCommunicator ().send (burstMessage, 2500);
+                    
+                    if (!comm.getCommunicator ().isRunning ()) {
+                        comm.getCommunicator ().removeHandler (this);
+                        return -1; //communicator went down
+                    }
                 } while (responseMessage == null && !stop); //wait for burst confirmation and request blocks
 
                 long endTime = System.currentTimeMillis () - cost;
