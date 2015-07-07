@@ -219,7 +219,7 @@ public class FileTransferChannel extends SystemHandler
                 do {
                     //send burst confirmation
                     responseMessage = comm.getCommunicator ().send (burstMessage, 2500);
-                    
+
                     if (!comm.getCommunicator ().isRunning ()) {
                         comm.getCommunicator ().removeHandler (this);
                         return -1; //communicator went down
@@ -286,8 +286,13 @@ public class FileTransferChannel extends SystemHandler
 
         try (RandomAccessFile raf = new RandomAccessFile (file, "rw")) {
             while (!stop) {
-                FileDataMessage[] capturedBlocks = capturedBlockSet.toArray (
-                        new FileDataMessage[capturedBlockSet.size ()]);
+                int size = capturedBlockSet.size ();
+                FileDataMessage[] capturedBlocks;
+                if (size == 0) {
+                    capturedBlocks = new FileDataMessage[0];
+                } else {
+                    capturedBlocks = capturedBlockSet.toArray (new FileDataMessage[size]);
+                }
 
                 if (capturedBlocks.length > 0) {
                     int[] captured = new int[capturedBlocks.length];
@@ -330,6 +335,8 @@ public class FileTransferChannel extends SystemHandler
 
                 if (receiveFinished) {
                     break;
+                } else if (!comm.getCommunicator ().isRunning ()) {
+                    stop = true;
                 }
             }
         }
