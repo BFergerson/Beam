@@ -41,7 +41,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 /**
@@ -54,6 +53,8 @@ public class FileTransferChannel extends SystemHandler
 
     private final static int BUFFER_SIZE = 1024 * 1024; //1MB
     private final static int DEFAULT_BURST_SIZE = 10; //10MB
+    private final static int BURST_CONFIRMATION_WAIT_TIME = 1000 * 15; //15 seconds
+    private final static int BLOCK_INTERVAL_WAIT_TIME = 1000 * 30; //30 seconds
 
     private boolean stop = false;
     private boolean connected = false;
@@ -74,7 +75,7 @@ public class FileTransferChannel extends SystemHandler
         this.comm = comm;
         this.transferChannelId = transferChannelId;
         downloadedBlockSet = new HashSet<> ();
-        capturedBlockSet = Collections.newSetFromMap (new ConcurrentHashMap<FileDataMessage, Boolean> ());
+        capturedBlockSet = Collections.synchronizedSet (new HashSet<FileDataMessage> ());
     }
 
     public void connect (long remoteTransferChannelId) {
@@ -140,6 +141,7 @@ public class FileTransferChannel extends SystemHandler
         //send block ids/sizes
         BeamMessage responseMessage = comm.getCommunicator ().send (burstMessage);
         if (responseMessage == null || !responseMessage.isSuccessful ()) {
+            comm.getCommunicator ().removeHandler (this);
             throw new TransferException ("Unable to receive file burst confirmation!");
         }
 
@@ -230,6 +232,7 @@ public class FileTransferChannel extends SystemHandler
                 cost = System.currentTimeMillis ();
                 burstMessage = new FileBurstMessage (responseMessage);
                 if (burstMessage.isBurstComplete ()) {
+                    totalSentData = fileSize;
                     break; //file finished transferring
                 } else {
                     long sentData = 0;
@@ -280,7 +283,7 @@ public class FileTransferChannel extends SystemHandler
 
         stop = false;
         long fileSize = file.length ();
-        long cost = System.currentTimeMillis ();
+        long lastProcessedBlockTime = System.currentTimeMillis ();
         long recievedData = 0;
         int lastOutputSize = 0;
 
@@ -319,13 +322,13 @@ public class FileTransferChannel extends SystemHandler
 
                     if (tracker != null) {
                         try {
-                            tracker.updateStats (fileSize, recievedData, rawData.length, System.currentTimeMillis () - cost);
+                            tracker.updateStats (fileSize, recievedData, rawData.length, System.currentTimeMillis () - lastProcessedBlockTime);
                         } catch (Exception ex) {
                             ex.printStackTrace ();
                         }
                     }
 
-                    cost = System.currentTimeMillis ();
+                    lastProcessedBlockTime = System.currentTimeMillis ();
                 }
 
                 if (!downloadedBlockSet.isEmpty () && lastOutputSize < downloadedBlockSet.size ()) {
@@ -336,6 +339,15 @@ public class FileTransferChannel extends SystemHandler
                 if (receiveFinished) {
                     break;
                 } else if (!comm.getCommunicator ().isRunning ()) {
+                    stop = true;
+                }
+
+                long timeWaited = System.currentTimeMillis () - lastProcessedBlockTime;
+                if (receiveBlockCount == -1 && size == 0 && timeWaited >= BURST_CONFIRMATION_WAIT_TIME) {
+                    log.warning ("Timed out receieving burst message. Closing file receive transfer...");
+                    stop = true;
+                } else if (timeWaited >= BLOCK_INTERVAL_WAIT_TIME) {
+                    log.warning ("Timed out waiting for any file block message. Closing file receive transfer...");
                     stop = true;
                 }
             }
