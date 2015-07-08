@@ -37,7 +37,7 @@ import java.util.Arrays;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public abstract class BeamHandler
+public abstract class BeamHandler<MessageT extends BeamMessage>
 {
 
     private final boolean systemHandler;
@@ -103,9 +103,9 @@ public abstract class BeamHandler
         //meant to be overridden
     }
 
-    public final BeamMessage processMessage (final Communicator comm, final BeamMessage message) {
-        BeamMessage processedMessage = processIncomingMessage (comm, message);
-        processedMessage = messageReceived (comm, processedMessage);
+    public final MessageT processMessage (final Communicator comm, final MessageT message) {
+        MessageT processedMessage = processIncomingMessage (comm, message);
+        processedMessage = messageReceived (comm, castMessage (processedMessage));
 
         if (processedMessage != null) {
             processedMessage = processOutgoingMessage (comm, message, processedMessage);
@@ -118,17 +118,21 @@ public abstract class BeamHandler
         return processedMessage;
     }
 
-    public BeamMessage processIncomingMessage (final Communicator comm, final BeamMessage message) {
+    public MessageT processIncomingMessage (final Communicator comm, final MessageT message) {
         //no processing here; available to be overridden
         return message;
     }
 
-    public BeamMessage processOutgoingMessage (final Communicator comm,
-            final BeamMessage originalMessage, final BeamMessage responseMessage) {
+    public MessageT processOutgoingMessage (final Communicator comm,
+            final MessageT originalMessage, final MessageT responseMessage) {
         //no processing here; available to be overridden
         return responseMessage;
     }
 
-    public abstract BeamMessage messageReceived (final Communicator comm, final BeamMessage message);
+    public abstract MessageT messageReceived (final Communicator comm, final MessageT message);
+
+    public <T extends BeamMessage> T castMessage (T message) {
+        return message;
+    }
 
 }
