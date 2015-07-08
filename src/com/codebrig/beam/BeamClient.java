@@ -56,7 +56,7 @@ import javax.net.ssl.SSLSocketFactory;
  */
 public class BeamClient
 {
-    
+
     private static final String[] CIPHER_SUITES = {
         "SSL_DH_anon_WITH_RC4_128_MD5",
         "SSL_DH_anon_WITH_3DES_EDE_CBC_SHA",
@@ -64,7 +64,7 @@ public class BeamClient
         "SSL_DH_anon_EXPORT_WITH_RC4_40_MD5",
         "SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA"
     };
-    
+
     private ConnectionType.Incoming[] incomingConnectionTypes
             = new ConnectionType.Incoming[] {
                 ConnectionType.Incoming.DIRECT
@@ -73,11 +73,11 @@ public class BeamClient
             = new ConnectionType.Outgoing[] {
                 ConnectionType.Outgoing.DIRECT
             };
-    
+
     private final String host;
     private final String clientName;
     private final int port;
-    private final boolean secure;
+    private final boolean sslSocket;
 //    private final Proxy proxy;
 //    private final String proxyUsername;
 //    private final String proxyPassword;
@@ -85,36 +85,44 @@ public class BeamClient
     private Communicator communicator;
     private boolean connected = false;
     private boolean debugOutput;
-    
+
     public BeamClient (String host, int port) {
         this (host, null, port, true);
     }
-    
+
     public BeamClient (String host, String clientName, int port) {
         this (host, clientName, port, true);
     }
-    
-    public BeamClient (String host, String clientName, int port, boolean secure) {
+
+    public BeamClient (String host, String clientName, int port, boolean useSSLSocket) {
         this.host = host;
         this.clientName = clientName;
         this.port = port;
-        this.secure = secure;
+        this.sslSocket = useSSLSocket;
     }
-    
+
+    public BeamClient (Communicator communicator) {
+        this.host = communicator.getHostIPAddress ();
+        this.clientName = communicator.getName ();
+        this.port = communicator.getPort ();
+        this.sslSocket = communicator.isSSLSocket ();
+        this.communicator = communicator;
+    }
+
     public void connect () throws IOException {
         connect (null);
     }
-    
+
     public void connect (BeamMessageType messageType) throws IOException {
         boolean tunnel = false;
         Proxy proxy = null;
         String proxyUsername = null;
         String proxyPassword = null;
-        
+
         if (proxy != null) {
-            if (secure) {
+            if (sslSocket) {
                 final SocketFactory factory = SSLSocketFactory.getDefault ();
-                
+
                 final SSLSocket sock;
                 Socket tmpSock = new Socket (proxy);
                 if (proxyPassword != null && proxyPassword.isEmpty ()) {
@@ -123,9 +131,9 @@ public class BeamClient
                     Authenticator.setDefault (null);
                 }
                 tmpSock.connect (new InetSocketAddress (host, port));
-                
+
                 sock = (SSLSocket) ((SSLSocketFactory) factory).createSocket (tmpSock, host, port, true);
-                
+
                 sock.setEnabledCipherSuites (CIPHER_SUITES);
                 if (tunnel) {
                     communicator = JHttpTunnelClient.getCommunicator (host, port); //todo: use sock to get host
@@ -140,7 +148,7 @@ public class BeamClient
                     Authenticator.setDefault (null);
                 }
                 sock.connect (new InetSocketAddress (host, port));
-                
+
                 if (tunnel) {
                     communicator = JHttpTunnelClient.getCommunicator (host, port); //todo: use sock to get host
                 } else {
@@ -148,10 +156,10 @@ public class BeamClient
                 }
             }
         } else {
-            if (secure) {
+            if (sslSocket) {
                 final SocketFactory factory = SSLSocketFactory.getDefault ();
                 final SSLSocket sock = (SSLSocket) factory.createSocket (host, port);
-                
+
                 sock.setEnabledCipherSuites (CIPHER_SUITES);
                 if (tunnel) {
                     communicator = JHttpTunnelClient.getCommunicator (host, port);
@@ -172,120 +180,120 @@ public class BeamClient
                 }
             }
         }
-        
+
         communicator.setMessageType (messageType);
         communicator.setDebugOutput (debugOutput);
         communicator.performBeamHandshake ();
         connected = true;
     }
-    
+
     public void setIncomingConnectionTypes (ConnectionType.Incoming[] incomingConnections) {
         if (incomingConnections != null) {
             this.incomingConnectionTypes = incomingConnections;
         }
     }
-    
+
     public ConnectionType.Incoming[] getIncomingConnectionTypes () {
         return incomingConnectionTypes;
     }
-    
+
     public void setOutgoingConnectionTypes (ConnectionType.Outgoing[] outgoingConnections) {
         if (outgoingConnections != null) {
             this.outgoingConnectionTypes = outgoingConnections;
         }
     }
-    
+
     public ConnectionType.Outgoing[] getOutgoingConnectionTypes () {
         return outgoingConnectionTypes;
     }
-    
+
     public Communicator getCommunicator () {
         return communicator;
     }
-    
-    public boolean isSecure () {
-        return secure;
+
+    public boolean isSSLSocket () {
+        return sslSocket;
     }
-    
+
     public boolean isConnected () {
         return connected;
     }
-    
+
     public void close () {
         if (communicator != null) {
             communicator.close ();
         }
     }
-    
+
     public BeamMessage sendMessage (BeamMessage message) {
         if (!connected) {
             throw new CommunicatorException ("Client has not yet been connected!");
         }
-        
+
         return communicator.send (message);
     }
-    
+
     public void queueMessage (BeamMessage message) {
         if (!connected) {
             throw new CommunicatorException ("Client has not yet been connected!");
         }
-        
+
         communicator.queue (message);
     }
-    
+
     public RSAConnection establishRSAConnection (RSA publicKey) {
         if (!connected) {
             throw new CommunicatorException ("Client has not yet been connected!");
         }
-        
+
         return establishRSAConnection (publicKey, 100);
     }
-    
+
     public RSAConnection establishRSAConnection (RSA publicKey, int keyCharCount) {
         if (!connected) {
             throw new CommunicatorException ("Client has not yet been connected!");
         } else if (publicKey == null) {
             throw new IllegalArgumentException ("Missing public key!");
         }
-        
+
         RSAHandshakeMessage rsaMessage = new RSAHandshakeMessage ();
         String connectionKey = Generator.makeString (keyCharCount);
         rsaMessage.setConnectionKey (publicKey.encrypt (connectionKey));
-        
+
         BeamMessage respMessage = communicator.send (rsaMessage);
         if (respMessage != null) {
             RSAHandshakeMessage respRSAMessage = new RSAHandshakeMessage (respMessage);
-            
+
             if (respRSAMessage.isSuccessful ()) {
                 RSAConnection rsaConnection
                         = new RSAConnection (publicKey, new AES (connectionKey), respRSAMessage.getSession ());
                 RSAConnectionHolder.addRSAConnection (communicator, rsaConnection);
-                
+
                 return rsaConnection;
             }
         }
-        
+
         return null;
     }
-    
+
     public void setDebugOutput (boolean debugOutput) {
         this.debugOutput = debugOutput;
-        
+
         if (communicator != null) {
             communicator.setDebugOutput (debugOutput);
         }
     }
-    
+
     public boolean isDebugOutput () {
         return debugOutput;
     }
-    
+
     private static class AuthenticatorImpl extends Authenticator
     {
-        
+
         private final String username;
         private final String password;
-        
+
         public AuthenticatorImpl (Proxy.Type proxyType, String username, String password) {
             if (username == null) {
                 username = "";
@@ -296,15 +304,15 @@ public class BeamClient
             if (!password.isEmpty () && proxyType == Proxy.Type.HTTP) {
                 password = new String (Base64.encode (username + ":" + Arrays.toString (password.getBytes ())));
             }
-            
+
             this.username = username;
             this.password = password;
         }
-        
+
         @Override
         public PasswordAuthentication getPasswordAuthentication () {
             return new PasswordAuthentication (username, password.toCharArray ());
         }
     }
-    
+
 }

@@ -69,6 +69,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.net.ssl.SSLSocket;
 import net.rudp.ReliableSocket;
 
 /**
@@ -1109,6 +1110,10 @@ public class Communicator implements Runnable
 
     public boolean isUserClosed () {
         return userClosed;
+    }
+
+    public boolean isSSLSocket () {
+        return socket instanceof SSLSocket;
     }
 
     public synchronized boolean isClaimed () {
