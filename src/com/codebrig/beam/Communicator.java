@@ -813,8 +813,15 @@ public class Communicator implements Runnable
                 processMessage (msg);
                 msg = fetch (handler.getTypes ());
             }
+
+            return true;
         }
 
+        BeamMessage msg = fetch (handler.getTypes ());
+        while (msg != null) {
+            processMessage (msg);
+            msg = fetch (handler.getTypes ());
+        }
         return false;
     }
 
@@ -876,6 +883,7 @@ public class Communicator implements Runnable
                     new Thread (new Runnable ()
                     {
 
+                        @Override
                         public void run () {
                             BeamMessage rtnMsg;
                             if ((rtnMsg = handler.processMessage (Communicator.this, message)) != null) {
@@ -912,6 +920,7 @@ public class Communicator implements Runnable
                     new Thread (new Runnable ()
                     {
 
+                        @Override
                         public void run () {
                             immediateHandler.messageReceived (Communicator.this, message);
                         }
@@ -932,6 +941,7 @@ public class Communicator implements Runnable
                     new Thread (new Runnable ()
                     {
 
+                        @Override
                         public void run () {
                             BeamMessage rtnMsg;
                             if ((rtnMsg = handler.processMessage (Communicator.this, message)) != null) {
@@ -951,21 +961,23 @@ public class Communicator implements Runnable
 
         //if it reaches here then we couldn't find anywhere to put the message.
         //add it to "lost & found" and hope someone comes to pick it up (fetch()).
-        if (message.isSystemMessage ()) {
-            System.out.println (String.format (
-                    "Unable to find handler for system message: %s", systemMessageType.getName (message.getType ())));
-        } else if (messageType != null) {
-            String type = messageType.getName (message.getType ());
-            if (type != null) {
+        if (debugOutput) {
+            if (message.isSystemMessage ()) {
                 System.out.println (String.format (
-                        "Unable to find handler for message: %s", type));
+                        "Unable to find handler for system message: %s", systemMessageType.getName (message.getType ())));
+            } else if (messageType != null) {
+                String type = messageType.getName (message.getType ());
+                if (type != null) {
+                    System.out.println (String.format (
+                            "Unable to find handler for message: %s", type));
+                } else {
+                    System.out.println (String.format (
+                            "Unable to find handler for message of type: %s", message.getType ()));
+                }
             } else {
                 System.out.println (String.format (
                         "Unable to find handler for message of type: %s", message.getType ()));
             }
-        } else {
-            System.out.println (String.format (
-                    "Unable to find handler for message of type: %s", message.getType ()));
         }
 
         unhandledMessages.add (message);
