@@ -29,7 +29,7 @@
  */
 package com.codebrig.beam.pool;
 
-import com.codebrig.beam.Communicator;
+import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.messages.BeamMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,20 +40,20 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class DefaultCommunicatorPool implements CommunicatorPool
+public class DefaultClientPool<ClientT extends BeamClient> implements ClientPool<ClientT>
 {
 
     private String name;
-    private final Map<Long, Communicator> communicators;
+    private final Map<Long, ClientT> clients;
 
-    public DefaultCommunicatorPool () {
-        name = "DefaultCommunicatorPool";
-        communicators = new ConcurrentHashMap<> ();
+    public DefaultClientPool () {
+        name = "DefaultClientPool";
+        clients = new ConcurrentHashMap<> ();
     }
 
-    public DefaultCommunicatorPool (Map<Long, Communicator> communicators) {
-        name = "DefaultCommunicatorPool";
-        this.communicators = communicators;
+    public DefaultClientPool (Map<Long, ClientT> clients) {
+        name = "DefaultClientPool";
+        this.clients = clients;
     }
 
     @Override
@@ -67,22 +67,20 @@ public class DefaultCommunicatorPool implements CommunicatorPool
     }
 
     @Override
-    public void addCommunicator (Communicator communicator) {
-        communicators.put (communicator.getUID (), communicator);
+    public void addClient (ClientT client) {
+        clients.put (client.getCommunicator ().getUID (), client);
     }
 
     @Override
-    public Communicator removeCommunicator (long communicatorUID) {
-        return communicators.remove (communicatorUID);
+    public ClientT removeClient (long clientUID) {
+        return clients.remove (clientUID);
     }
 
     @Override
-    public boolean sendDirectMessage (long communicatorUID, BeamMessage message) {
-        Communicator comm = communicators.get (communicatorUID);
-
-        if (comm != null && comm.isRunning ()) {
-            comm.queue (message);
-
+    public boolean sendDirectMessage (long clientUID, BeamMessage message) {
+        ClientT comm = clients.get (clientUID);
+        if (comm != null && comm.getCommunicator ().isRunning ()) {
+            comm.getCommunicator ().queue (message);
             return true;
         }
 
@@ -91,28 +89,27 @@ public class DefaultCommunicatorPool implements CommunicatorPool
 
     @Override
     public int broadcastMessage (BeamMessage message) {
-        final Iterator<Communicator> itr = communicators.values ().iterator ();
+        final Iterator<ClientT> itr = clients.values ().iterator ();
         final ArrayList<Long> purgeList = new ArrayList<> ();
         int sendCount = 0;
 
         while (itr.hasNext ()) {
-            final Communicator comm = itr.next ();
-
+            final ClientT comm = itr.next ();
             if (comm != null) {
-                if (comm.isRunning ()) {
-                    comm.queue (message);
+                if (comm.getCommunicator ().isRunning ()) {
+                    comm.getCommunicator ().queue (message);
                     sendCount++;
-                } else if (!comm.isRunning ()) {
-                    //old communicator, need to purge it
-                    purgeList.add (comm.getUID ());
+                } else if (!comm.getCommunicator ().isRunning ()) {
+                    //old client, need to purge it
+                    purgeList.add (comm.getCommunicator ().getUID ());
                 }
             }
         }
 
         if (!purgeList.isEmpty ()) {
-            //got some communicators we need to get rid of
+            //got some clients we need to get rid of
             for (long oldCommUID : purgeList) {
-                removeCommunicator (oldCommUID);
+                removeClient (oldCommUID);
             }
         }
 
@@ -121,30 +118,29 @@ public class DefaultCommunicatorPool implements CommunicatorPool
 
     @Override
     public void close () {
-        Iterator<Communicator> itr = communicators.values ().iterator ();
+        Iterator<ClientT> itr = clients.values ().iterator ();
         while (itr.hasNext ()) {
-            Communicator comm = itr.next ();
-
+            ClientT comm = itr.next ();
             if (comm != null) {
                 comm.close ();
             }
         }
 
-        communicators.clear ();
+        clients.clear ();
     }
 
     @Override
-    public boolean hasCommunicator (long commmunicatorUID) {
-        Communicator comm = getCommunicator (commmunicatorUID);
+    public boolean hasClient (long clientUID) {
+        ClientT comm = getClient (clientUID);
         return comm != null;
     }
 
     @Override
-    public Communicator getCommunicator (long communicatorUID) {
-        Communicator comm = communicators.get (communicatorUID);
-        if (comm != null && !comm.isRunning ()) {
+    public ClientT getClient (long clientUID) {
+        ClientT comm = clients.get (clientUID);
+        if (comm != null && !comm.getCommunicator ().isRunning ()) {
             //comm no longer running
-            removeCommunicator (communicatorUID);
+            removeClient (clientUID);
             return null;
         }
 
@@ -153,12 +149,12 @@ public class DefaultCommunicatorPool implements CommunicatorPool
 
     @Override
     public int size () {
-        return communicators.size ();
+        return clients.size ();
     }
 
     @Override
-    public Map<Long, Communicator> getAllCommunicators () {
-        return new HashMap<> (communicators);
+    public Map<Long, ClientT> getAllClients () {
+        return new HashMap<> (clients);
     }
 
 }

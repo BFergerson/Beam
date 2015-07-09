@@ -82,7 +82,7 @@ public class BeamClient
 //    private final String proxyUsername;
 //    private final String proxyPassword;
 
-    private Communicator communicator;
+    private Communicator comm;
     private boolean connected = false;
     private boolean debugOutput;
 
@@ -106,7 +106,7 @@ public class BeamClient
         this.clientName = communicator.getName ();
         this.port = communicator.getPort ();
         this.sslSocket = communicator.isSSLSocket ();
-        this.communicator = communicator;
+        this.comm = communicator;
     }
 
     public void connect () throws IOException {
@@ -136,9 +136,9 @@ public class BeamClient
 
                 sock.setEnabledCipherSuites (CIPHER_SUITES);
                 if (tunnel) {
-                    communicator = JHttpTunnelClient.getCommunicator (host, port); //todo: use sock to get host
+                    comm = JHttpTunnelClient.getCommunicator (host, port); //todo: use sock to get host
                 } else {
-                    communicator = new Communicator (sock, clientName, false);
+                    comm = new Communicator (sock, clientName, false);
                 }
             } else {
                 final Socket sock = new Socket (proxy);
@@ -150,9 +150,9 @@ public class BeamClient
                 sock.connect (new InetSocketAddress (host, port));
 
                 if (tunnel) {
-                    communicator = JHttpTunnelClient.getCommunicator (host, port); //todo: use sock to get host
+                    comm = JHttpTunnelClient.getCommunicator (host, port); //todo: use sock to get host
                 } else {
-                    communicator = new Communicator (sock, clientName, false);
+                    comm = new Communicator (sock, clientName, false);
                 }
             }
         } else {
@@ -162,9 +162,9 @@ public class BeamClient
 
                 sock.setEnabledCipherSuites (CIPHER_SUITES);
                 if (tunnel) {
-                    communicator = JHttpTunnelClient.getCommunicator (host, port);
+                    comm = JHttpTunnelClient.getCommunicator (host, port);
                 } else {
-                    communicator = new Communicator (sock, clientName, false);
+                    comm = new Communicator (sock, clientName, false);
                 }
             } else {
                 final Socket sock;
@@ -174,16 +174,16 @@ public class BeamClient
                     sock = new Socket (host, port);
                 }
                 if (tunnel) {
-                    communicator = JHttpTunnelClient.getCommunicator (host, port);
+                    comm = JHttpTunnelClient.getCommunicator (host, port);
                 } else {
-                    communicator = new Communicator (sock, clientName, false);
+                    comm = new Communicator (sock, clientName, false);
                 }
             }
         }
 
-        communicator.setMessageType (messageType);
-        communicator.setDebugOutput (debugOutput);
-        communicator.performBeamHandshake ();
+        comm.setMessageType (messageType);
+        comm.setDebugOutput (debugOutput);
+        comm.performBeamHandshake ();
         connected = true;
     }
 
@@ -208,7 +208,7 @@ public class BeamClient
     }
 
     public Communicator getCommunicator () {
-        return communicator;
+        return comm;
     }
 
     public boolean isSSLSocket () {
@@ -216,12 +216,12 @@ public class BeamClient
     }
 
     public boolean isConnected () {
-        return connected;
+        return connected && comm.isRunning ();
     }
 
     public void close () {
-        if (communicator != null) {
-            communicator.close ();
+        if (comm != null) {
+            comm.close ();
         }
     }
 
@@ -230,7 +230,7 @@ public class BeamClient
             throw new CommunicatorException ("Client has not yet been connected!");
         }
 
-        return communicator.send (message);
+        return comm.send (message);
     }
 
     public void queueMessage (BeamMessage message) {
@@ -238,7 +238,7 @@ public class BeamClient
             throw new CommunicatorException ("Client has not yet been connected!");
         }
 
-        communicator.queue (message);
+        comm.queue (message);
     }
 
     public RSAConnection establishRSAConnection (RSA publicKey) {
@@ -260,14 +260,14 @@ public class BeamClient
         String connectionKey = Generator.makeString (keyCharCount);
         rsaMessage.setConnectionKey (publicKey.encrypt (connectionKey));
 
-        BeamMessage respMessage = communicator.send (rsaMessage);
+        BeamMessage respMessage = comm.send (rsaMessage);
         if (respMessage != null) {
             RSAHandshakeMessage respRSAMessage = new RSAHandshakeMessage (respMessage);
 
             if (respRSAMessage.isSuccessful ()) {
                 RSAConnection rsaConnection
                         = new RSAConnection (publicKey, new AES (connectionKey), respRSAMessage.getSession ());
-                RSAConnectionHolder.addRSAConnection (communicator, rsaConnection);
+                RSAConnectionHolder.addRSAConnection (comm, rsaConnection);
 
                 return rsaConnection;
             }
@@ -279,8 +279,8 @@ public class BeamClient
     public void setDebugOutput (boolean debugOutput) {
         this.debugOutput = debugOutput;
 
-        if (communicator != null) {
-            communicator.setDebugOutput (debugOutput);
+        if (comm != null) {
+            comm.setDebugOutput (debugOutput);
         }
     }
 
