@@ -407,9 +407,6 @@ public class Communicator implements Runnable
         if (!userClosed) {
             running = false;
 
-            System.out.println (String.format ("%s (UID: %s); - disconnected",
-                    commThread.getName (), uid));
-
             //send null (a.k.a alert) to any waiting listeners
             for (ImmediateHandler immediateHandler : immediateHandlers) {
                 immediateHandler.messageReceived (this, null);
