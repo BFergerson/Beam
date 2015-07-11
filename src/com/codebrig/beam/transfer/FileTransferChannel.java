@@ -51,8 +51,8 @@ public class FileTransferChannel extends SystemHandler
 
     private static final Logger log = Logger.getLogger (FileTransferChannel.class.getName ());
 
-    private final static int BUFFER_SIZE = 1024 * 1024; //1MB
-    private final static int DEFAULT_BURST_SIZE = 10; //10MB
+    private final static int BUFFER_SIZE = 1024 * 256; //256KB
+    private final static int DEFAULT_BURST_SIZE = 10; //2.5MB
     private final static int BURST_CONFIRMATION_WAIT_TIME = 1000 * 15; //15 seconds
     private final static int BLOCK_INTERVAL_WAIT_TIME = 1000 * 30; //30 seconds
 
@@ -146,9 +146,6 @@ public class FileTransferChannel extends SystemHandler
         }
 
         long cost = System.currentTimeMillis ();
-        int totalDataSent = 0;
-        Set<Integer> countedBlockSet = new HashSet<> ();
-
         try (RandomAccessFile raf = new RandomAccessFile (file, "r")) {
             //repeat
             while (!stop) {
@@ -156,7 +153,6 @@ public class FileTransferChannel extends SystemHandler
                 int burstCount = 0;
                 Integer[] requiredBlocks = neededBlockSet.toArray (new Integer[neededBlockSet.size ()]);
                 for (int blockNumber : requiredBlocks) {
-                    long startTime = System.currentTimeMillis ();
 
                     long seekPosition = (long) blockNumber * (long) blockSize;
                     raf.seek (seekPosition);
@@ -176,35 +172,11 @@ public class FileTransferChannel extends SystemHandler
                     dataMessage.setBlockNumber (blockNumber);
                     dataMessage.setRawData (readBuffer);
 
-                    log.finest (String.format ("Sending - FileDataMessage; Block number: %s, Block size: %s",
-                            blockNumber, dataMessage.getData ().length));
-
                     comm.getCommunicator ().queue (dataMessage);
-                    long endTime = System.currentTimeMillis ();
-
-                    long costTime = endTime - startTime;
-                    int dataSent = dataMessage.getSize ();
-
-                    //theoretical sent data tracker
-                    if (tracker != null) {
-                        if (dataSent != 0 && !countedBlockSet.contains (dataMessage.getBlockNumber ())) {
-                            totalDataSent += dataSent;
-
-                            try {
-                                tracker.updateStats (fileSize, totalDataSent, dataSent, costTime);
-                            } catch (Exception ex) {
-                                ex.printStackTrace ();
-                            }
-
-                            countedBlockSet.add (dataMessage.getBlockNumber ());
-                        }
-                    }
+                    log.info (String.format ("Sent - FileDataMessage; Block number: %s, Block size: %s",
+                            blockNumber, dataMessage.getData ().length));
 
                     burstCount++;
-
-                    log.finest (String.format ("Sent - FileDataMessage; Block number: %s, Block size: %s",
-                            blockNumber, dataMessage.getData ().length));
-
                     if (burstCount >= burstSize && burstCount != 0) {
                         break;
                     }
@@ -212,7 +184,7 @@ public class FileTransferChannel extends SystemHandler
 
                 //sleep awhile incase data message hasn't finished flushing
                 try {
-                    Thread.sleep (100);
+                    Thread.sleep (250);
                 } catch (InterruptedException ex) {
                 }
 
