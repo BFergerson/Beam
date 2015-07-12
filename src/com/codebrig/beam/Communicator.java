@@ -233,6 +233,7 @@ public class Communicator implements Runnable
         }
 
         commThread.setName (String.format ("Communicator: %s; UID: %s", communicatorName, uid));
+        commThread.setDaemon (true);
         commThread.start ();
     }
 
