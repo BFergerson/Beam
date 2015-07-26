@@ -31,11 +31,10 @@ package com.codebrig.beam.utils;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -99,7 +98,7 @@ public class Pinger
     }
 
     public static List<String> pingOrderByFastestHost (final String... hostArg) throws InterruptedException {
-        final Set<String> finishedMap = new HashSet<> ();
+        final TreeMap<Long, String> finishedMap = new TreeMap<> ();
         final List<Thread> pingThreadList = new ArrayList<> ();
 
         for (final String host : hostArg) {
@@ -109,8 +108,12 @@ public class Pinger
                 @Override
                 public void run () {
                     try {
+                        long startTime = System.currentTimeMillis ();
                         ping (host);
-                        finishedMap.add (host);
+                        long endTime = System.currentTimeMillis ();
+                        long cost = endTime - startTime;
+
+                        finishedMap.put (cost, host);
                         if (finishedMap.size () >= hostArg.length) {
                             synchronized (finishedMap) {
                                 finishedMap.notifyAll ();
@@ -131,8 +134,7 @@ public class Pinger
             finishedMap.wait ();
         }
 
-        List<String> hostList = Arrays.asList (finishedMap.toArray (new String[finishedMap.size ()]));
-        Collections.reverse (hostList);
+        List<String> hostList = new ArrayList<> (finishedMap.values ());
         return hostList;
     }
 
