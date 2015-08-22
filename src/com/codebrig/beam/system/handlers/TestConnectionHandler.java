@@ -49,7 +49,7 @@ public class TestConnectionHandler extends SystemHandler
     public BeamMessage messageReceived (SystemCommunicator comm, BeamMessage message) {
         if (comm.isTestingConnection ()) {
             //we are the one testing connection, handle response message
-            comm.handleMessage (new SystemMessage (SystemMessageType.TEST_CONNECTION).toBeamMessage ());
+            comm.handleMessage (new SystemMessage (message).toBeamMessage ());
             return null;
         }
 

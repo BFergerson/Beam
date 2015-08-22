@@ -78,9 +78,9 @@ public class BeamClient
     private final String clientName;
     private final int port;
     private final boolean sslSocket;
-//    private final Proxy proxy;
-//    private final String proxyUsername;
-//    private final String proxyPassword;
+    private Proxy proxy;
+    private String proxyUsername;
+    private String proxyPassword;
 
     private Communicator comm;
     private boolean connected = false;
@@ -101,6 +101,15 @@ public class BeamClient
         this.sslSocket = useSSLSocket;
     }
 
+    public BeamClient (String host, String clientName, int port, boolean useSSLSocket,
+            Proxy proxy, String proxyUsername, String proxyPassword) {
+        this (host, clientName, port, useSSLSocket);
+
+        this.proxy = proxy;
+        this.proxyUsername = proxyUsername;
+        this.proxyPassword = proxyPassword;
+    }
+
     public BeamClient (Communicator communicator) {
         this.host = communicator.getHostIPAddress ();
         this.clientName = communicator.getName ();
@@ -115,9 +124,6 @@ public class BeamClient
 
     public void connect (BeamMessageType messageType) throws IOException {
         boolean tunnel = false;
-        Proxy proxy = null;
-        String proxyUsername = null;
-        String proxyPassword = null;
 
         if (proxy != null) {
             if (sslSocket) {
@@ -133,7 +139,6 @@ public class BeamClient
                 tmpSock.connect (new InetSocketAddress (host, port));
 
                 sock = (SSLSocket) ((SSLSocketFactory) factory).createSocket (tmpSock, host, port, true);
-
                 sock.setEnabledCipherSuites (CIPHER_SUITES);
                 if (tunnel) {
                     comm = JHttpTunnelClient.getCommunicator (host, port); //todo: use sock to get host
