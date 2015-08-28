@@ -27,7 +27,7 @@
  *
  * ====
  */
-package com.codebrig.beam.system.handlers;
+package com.codebrig.beam.system.handlers.ping;
 
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.SystemMessageType;

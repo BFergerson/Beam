@@ -27,7 +27,7 @@
  *
  * ====
  */
-package com.codebrig.beam.checksum;
+package com.codebrig.beam.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +45,7 @@ import javax.crypto.spec.PBEKeySpec;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class Digest
+public class Checksum
 {
 
     private static final int BUFFER_SIZE = 8192;

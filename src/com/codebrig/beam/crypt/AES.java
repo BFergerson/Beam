@@ -29,7 +29,7 @@
  */
 package com.codebrig.beam.crypt;
 
-import com.codebrig.beam.checksum.Digest;
+import com.codebrig.beam.utils.Checksum;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
@@ -51,7 +51,7 @@ public class AES
 
     public AES (String password) {
         if (password != null && !password.isEmpty ()) {
-            key = new SecretKeySpec (Digest.SHA1 (password)
+            key = new SecretKeySpec (Checksum.SHA1 (password)
                     .substring (0, 16).getBytes (), "AES");
 
             try {

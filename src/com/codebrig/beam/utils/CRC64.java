@@ -27,7 +27,7 @@
  *
  * ====
  */
-package com.codebrig.beam.checksum;
+package com.codebrig.beam.utils;
 
 /**
  * @author Lasse Collin <lasse.collin@tukaani.org>

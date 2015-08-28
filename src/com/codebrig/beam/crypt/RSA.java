@@ -29,7 +29,7 @@
  */
 package com.codebrig.beam.crypt;
 
-import com.codebrig.beam.checksum.Digest;
+import com.codebrig.beam.utils.Checksum;
 import com.codebrig.beam.utils.Base64;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -352,7 +352,7 @@ public class RSA
     }
 
     public String getPrivateKeySigned () {
-        return sign (Digest.MD5 (privKey.toString ()));
+        return sign (Checksum.MD5 (privKey.toString ()));
     }
 
     public String getPublicKeyBase64 () {

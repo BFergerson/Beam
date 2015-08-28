@@ -36,7 +36,7 @@ import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.connection.ConnectionType;
 import com.codebrig.beam.crypt.handlers.RSAHandshakeHandler;
 import com.codebrig.beam.messages.BeamMessageType;
-import com.codebrig.beam.system.handlers.ServerPingPongHandler;
+import com.codebrig.beam.system.handlers.ping.ServerPingPongHandler;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;

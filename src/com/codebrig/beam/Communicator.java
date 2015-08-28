@@ -37,7 +37,7 @@ import com.codebrig.beam.connection.raw.RawDataChannel;
 import com.codebrig.beam.crypt.EncryptedBeamMessage;
 import com.codebrig.beam.handlers.SystemHandler;
 import com.codebrig.beam.messages.BeamMessageType;
-import com.codebrig.beam.system.handlers.ClientPingPongHandler;
+import com.codebrig.beam.system.handlers.ping.ClientPingPongHandler;
 import com.codebrig.beam.system.handlers.HandshakeHandler;
 import com.codebrig.beam.system.handlers.TestConnectionHandler;
 import com.codebrig.beam.system.messages.HandshakeMessage;

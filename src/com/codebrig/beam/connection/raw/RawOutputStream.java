@@ -30,7 +30,7 @@
 package com.codebrig.beam.connection.raw;
 
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.checksum.CRC64;
+import com.codebrig.beam.utils.CRC64;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.utils.LimitedQueue;
 import java.io.IOException;
