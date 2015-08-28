@@ -39,7 +39,7 @@ import java.util.TreeMap;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class Pinger
+public class SystemPing
 {
 
     public static boolean ping (String host) throws IOException, InterruptedException {
