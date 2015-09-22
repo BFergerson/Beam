@@ -27,11 +27,12 @@
  *
  * ====
  */
-package com.codebrig.beam.connection.raw;
+package com.codebrig.beam.unit.connection.raw;
 
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.Communicator;
+import com.codebrig.beam.connection.raw.RawDataChannel;
 import com.codebrig.beam.handlers.BasicHandler;
 import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;

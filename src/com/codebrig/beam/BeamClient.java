@@ -36,6 +36,7 @@ import com.codebrig.beam.crypt.RSA;
 import com.codebrig.beam.crypt.RSAConnection;
 import com.codebrig.beam.crypt.RSAConnectionHolder;
 import com.codebrig.beam.crypt.messages.RSAHandshakeMessage;
+import com.codebrig.beam.handlers.BeamHandler;
 import com.codebrig.beam.messages.BeamMessageType;
 import com.codebrig.beam.utils.Base64;
 import com.codebrig.beam.utils.Generator;
@@ -291,6 +292,19 @@ public class BeamClient
 
     public boolean isDebugOutput () {
         return debugOutput;
+    }
+
+    public void addHandler (Class<? extends BeamHandler> type) {
+        if (!connected) {
+            throw new CommunicatorException ("Client has not yet been connected!");
+        }
+
+        try {
+            final BeamHandler handler = (BeamHandler) type.newInstance ();
+            comm.addHandler (handler);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            ex.printStackTrace ();
+        }
     }
 
     private static class AuthenticatorImpl extends Authenticator

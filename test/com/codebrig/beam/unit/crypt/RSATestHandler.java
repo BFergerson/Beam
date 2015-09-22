@@ -27,7 +27,7 @@
  *
  * ====
  */
-package com.codebrig.beam.crypt;
+package com.codebrig.beam.unit.crypt;
 
 import com.codebrig.beam.crypt.handlers.RSABeamHandler;
 import com.codebrig.beam.messages.BeamMessage;

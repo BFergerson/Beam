@@ -27,18 +27,18 @@
  *
  * ====
  */
-package com.codebrig.beam.connection.traversal.punch.udp;
+package com.codebrig.beam.unit.connection.traversal.punch.udp;
 
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.Communicator;
-import static com.codebrig.beam.connection.traversal.punch.udp.TestUDPPunchServer.*;
-import com.codebrig.beam.connection.traversal.punch.udp.client.UDPPunchClient;
+import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.*;
+import com.codebrig.beam.connection.traversal.punch.udp.client.UDPHoleClient;
 import com.codebrig.beam.messages.BasicMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class TestUDPPunchClient
+public class TestUDPHoleClient
 {
 
     public static void main (String[] args) throws Exception {
@@ -55,27 +55,23 @@ public class TestUDPPunchClient
         //for debugging purposes
         Communicator.setGlobalDefaultWaitTime (Communicator.WAIT_FOREVER);
 
-        UDPPunchClient punchClient = new UDPPunchClient (serverHost, serverPort);
-        Communicator peerComm = punchClient.punchPeerCommunicator (
+        UDPHoleClient holeClient = new UDPHoleClient (serverHost, serverPort);
+        Communicator peerComm = holeClient.createHoleCommunicator (
                 TEST_PUNCH_PEER_IDENTIFIER, TEST_PUNCH_PEER_ACCESS_CODE);
 
-        if (peerComm == null) {
-            System.out.println ("Could not find peer to connect to! Make sure peer is waiting with hole request...");
-            return;
-        }
+        //recieve test message
+        BeamMessage message = peerComm.fetchWithWait (Communicator.WAIT_FOREVER, TEST_PUNCH_MESSAGE_TYPE);
+        BasicMessage basicMessage = new BasicMessage (message);
 
-        //handshake
-        peerComm.performBeamHandshake ();
+        //verify message
+        assert (basicMessage.getString ("test_message").equals ("test_data"));
 
-        //send test message
-        BasicMessage message = new BasicMessage (TEST_PUNCH_MESSAGE_TYPE);
-        message.setString ("test_message", "test_data");
-        BeamMessage rtnMessage = peerComm.send (message);
-        message = new BasicMessage (rtnMessage);
+        System.out.println ("UDP hole client request successful!");
 
-        //verify response
-        assert (message.getString ("response_message").equals ("response_data"));
-        System.out.println ("UDP punch client response successful!");
+        //send response
+        basicMessage.clear ();
+        basicMessage.setString ("response_message", "response_data");
+        peerComm.queue (basicMessage);
 
         //clean up
         Thread.sleep (500);

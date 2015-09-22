@@ -27,7 +27,7 @@
  *
  * ====
  */
-package com.codebrig.beam.transfer;
+package com.codebrig.beam.unit;
 
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
@@ -35,13 +35,12 @@ import com.codebrig.beam.Communicator;
 import com.codebrig.beam.handlers.BasicHandler;
 import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;
-import java.io.File;
 import java.io.IOException;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class TestFileTransfer
+public class TestClientServer
 {
 
     public final static int TEST_PORT = 4444;
@@ -56,18 +55,14 @@ public class TestFileTransfer
         //start server
         startServer ();
 
-        //start client
-        BeamClient client = startClient ();
+        //start up multiple clients
+        for (int i = 0; i < 10; i++) {
+            BeamClient client = startClient ();
+            sendMessageToServer (client);
+        }
 
-        FileTransferChannel fileChannel = client.getCommunicator ().createFileTransferChannel ();
-        BasicMessage message = new BasicMessage (TEST_MESSAGE)
-                .setLong ("channel_id", fileChannel.getTransferChannelId ());
-        BeamMessage responseMessage = client.getCommunicator ().send (message);
-        message = new BasicMessage (responseMessage);
-
-        fileChannel.connect (message.getLong ("channel_id"));
-        fileChannel.sendFile (new File ("C:\\temp\\send_file.txt"));
-        fileChannel.close ();
+        //broadcast message to all clients from server
+        broadcastMessage ();
 
         //and we're done
         server.close ();
@@ -77,6 +72,9 @@ public class TestFileTransfer
     private static BeamClient startClient () throws IOException {
         BeamClient client = new BeamClient ("localhost", TEST_PORT);
         client.connect ();
+
+        //add broadcast handler
+        client.getCommunicator ().addHandler (new TestClientBroadcastHandler ());
 
         return client;
     }
@@ -91,24 +89,31 @@ public class TestFileTransfer
 
             @Override
             public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
-                //user wants to transfer a file. establish file transfer channel
-                FileTransferChannel fileChannel = comm.createFileTransferChannel ();
-                fileChannel.connect (message.getLong ("channel_id"));
+                System.out.println ("Received message from client: " + message.getString ("client_message"));
 
+                //clear and add response
                 message.clear ();
-                message.setSuccessful (true).setLong ("channel_id", fileChannel.getTransferChannelId ());
-                comm.queue (message);
+                message.setString ("server_response", "Hello from server!");
 
-                try {
-                    fileChannel.receiveFile (new File ("C:\\temp\\receive_file_" + System.currentTimeMillis () + ".txt"));
-                    fileChannel.close ();
-                } catch (IOException ex) {
-                    ex.printStackTrace ();
-                }
-
-                return null;
+                return message;
             }
         });
+    }
+
+    private static void sendMessageToServer (BeamClient client) {
+        BasicMessage message = new BasicMessage (TEST_MESSAGE);
+        message.setString ("client_message", "Hello from client!");
+        
+        BeamMessage responseMessage = client.getCommunicator ().send (message);
+        BasicMessage responseBasicMessage = new BasicMessage (responseMessage);
+        System.out.println ("Received message from server: " + responseBasicMessage.getString ("server_response"));
+    }
+
+    private static void broadcastMessage () {
+        BasicMessage message = new BasicMessage (TEST_MESSAGE);
+        message.setString ("broadcast_message", "Hello everyone from server!");
+
+        server.broadcast (message);
     }
 
 }

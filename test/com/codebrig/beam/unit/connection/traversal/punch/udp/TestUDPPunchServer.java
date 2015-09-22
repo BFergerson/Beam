@@ -27,28 +27,25 @@
  *
  * ====
  */
-package com.codebrig.beam;
+package com.codebrig.beam.unit.connection.traversal.punch.udp;
 
-import com.codebrig.beam.handlers.BasicHandler;
-import com.codebrig.beam.messages.BasicMessage;
-import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.connection.traversal.punch.udp.server.UDPPunchServer;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class TestServerHandler extends BasicHandler
+public class TestUDPPunchServer
 {
 
-    public TestServerHandler () {
-        super (TestClientServer.TEST_MESSAGE);
-    }
+    public static final int TEST_PUNCH_SERVER_PORT = 33333;
 
-    @Override
-    public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
-        System.out.println ("Client sent message: " + message.getString ("client_message"));
+    public static final String TEST_PUNCH_PEER_IDENTIFIER = "TEST_IDENT";
+    public static final String TEST_PUNCH_PEER_ACCESS_CODE = "SECRET";
+    public static final int TEST_PUNCH_MESSAGE_TYPE = 1;
 
-        //don't respond
-        return null;
+    public static void main (String[] args) {
+        UDPPunchServer punchServer = new UDPPunchServer ("Test Punch Server", TEST_PUNCH_SERVER_PORT);
+        punchServer.start ();
     }
 
 }
