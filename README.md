@@ -37,12 +37,11 @@ public class ExampleHandler extends BasicHandler
 	}
 
 	@Override
-	public BeamMessage messageRecieved (Communicator comm, BasicMessage message) {
-		System.out.println ("Client sent message: " + message.getString ("client_message"));
+	public BeamMessage messageRecieved (Communicator comm, BasicMessage msg) {
+		System.out.println ("Client sent msg: " + msg.getString ("client_message"));
 
 		//response message
-		message.clear ();
-		return message.setString ("server_response", "example_reply_message");
+		return msg.emptyResponse ().setString ("server_response", "example_reply_message");
 	}
 }
 ```
@@ -100,7 +99,7 @@ BeamMessage responseMessage = client.sendMessage (exampleMessage);
 
 //convert and output server response
 exampleMessage = new ExampleMessage (responseMessage);
-System.out.println ("Server response: " + exampleMessage.getString ("server_response");
+System.out.println ("Server response: " + exampleMessage.getString ("server_response"));
 ```
 
 
@@ -122,7 +121,7 @@ client.queueMessage (exampleMessage);
 As a server you can broadcast messages to all connected clients
 ```java
 ExampleMessage exampleMessage = new ExampleMessage ();
-exampleMessage.setString("example_broadcast", "test_value");
+exampleMessage.setString ("example_broadcast", "test_value");
 
 server.broadcast (exampleMessage);
 ```
@@ -138,7 +137,7 @@ BeamMessage aesMessage = new AESBeamMessage (aes, ENCRYPTED_MESSAGE);
 aesMessage.set ("secret_variable", "secret_value");
 
 //send and receive response (response is returned decrypted)
-BeamMessage responseMessage = client.getCommunicator ().send (aesMessage);
+BeamMessage responseMessage = client.sendMessage (aesMessage);
 System.out.println ("Server response: " + responseMessage .get ("server_response");
 ```
 
@@ -174,7 +173,7 @@ BeamMessage rsaMessage = new RSABeamMessage (rsaConn, ENCRYPTED_MESSAGE);
 rsaMessage.set ("secret_variable", "secret_value");
 
 //send and receive response (response is returned decrypted)
-BeamMessage responseMessage = client.getCommunicator ().send (rsaMessage);
+BeamMessage responseMessage = client.sendMessage (rsaMessage);
 System.out.println ("Server response: " + responseMessage.get ("server_response");
 ```
 
@@ -219,9 +218,8 @@ BeamMessage message = peerComm.fetchWithWait (Communicator.WAIT_FOREVER, EXAMPLE
 BasicMessage basicMessage = new BasicMessage (message);
 System.out.println ("Client B sent: " + basicMessage.getString ("client_message"));
 
-//send response to Client B
-basicMessage.clear ();
-basicMessage.setString ("client_message", "Hello from Client A!");
+//queue response to Client B
+peerComm.queue (basicMessage.emptyResponse ().setString ("client_message", "Hello from Client A!"));
 ```
 
 Client B
@@ -252,9 +250,8 @@ BeamMessage message = peerComm.fetchWithWait (Communicator.WAIT_FOREVER, EXAMPLE
 BasicMessage basicMessage = new BasicMessage (message);
 System.out.println ("Client B sent: " + basicMessage.getString ("client_message"));
 
-//send response to Client B
-basicMessage.clear ();
-basicMessage.setString ("client_message", "Hello from Client A!");
+//queue response to Client B
+peerComm.queue (basicMessage.emptyResponse ().setString ("client_message", "Hello from Client A!"));
 ```
 
 Client B
