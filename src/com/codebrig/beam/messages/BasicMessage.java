@@ -201,4 +201,44 @@ public class BasicMessage<T extends BasicMessage> extends BeamMessage<T>
         return super.setErrorMessage (errorMessage);
     }
 
+    @Override
+    public T clear () {
+        return super.clear ();
+    }
+
+    @Override
+    public T copy () {
+        return super.copy ();
+    }
+
+    @Override
+    public T response () {
+        return super.response ();
+    }
+
+    @Override
+    public T emptyResponse () {
+        return super.emptyResponse ();
+    }
+
+    @Override
+    public T successResponse () {
+        return super.successResponse ();
+    }
+
+    @Override
+    public T emptySuccessResponse () {
+        return super.emptySuccessResponse ();
+    }
+
+    @Override
+    public T errorResponse () {
+        return super.errorResponse ();
+    }
+
+    @Override
+    public T emptyErrorResponse () {
+        return super.emptyErrorResponse ();
+    }
+
 }
