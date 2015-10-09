@@ -579,8 +579,41 @@ public class BeamMessage<T extends BeamMessage>
         return rawData;
     }
 
-    public void clear () {
+    public T clear () {
         messageMap.clear ();
+        return (T) this;
+    }
+
+    public T copy () {
+        return (T) new BeamMessage (this);
+    }
+
+    public T response () {
+        return copy ();
+    }
+
+    public T emptyResponse () {
+        return (T) response ().clear ();
+    }
+
+    public T successResponse () {
+        T msg = response ();
+        return (T) msg.setSuccessful (true);
+    }
+
+    public T emptySuccessResponse () {
+        T msg = successResponse ();
+        return (T) msg.clear ();
+    }
+
+    public T errorResponse () {
+        T msg = response ();
+        return (T) msg.setSuccessful (false);
+    }
+
+    public T emptyErrorResponse () {
+        T msg = errorResponse ();
+        return (T) msg.clear ();
     }
 
     private String[] toStringArray (Object... value) {
