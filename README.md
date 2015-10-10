@@ -2,7 +2,6 @@ Beam is client/server and peer-to-peer compatible networking library. It provide
 
 ## Overview ##
 * Creating a Server
-* Message Types
 * Message Handlers
 * Connecting a Client
 * Creating Messages
