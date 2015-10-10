@@ -7,6 +7,7 @@ Beam is client/server and peer-to-peer compatible networking library. It provide
 * Connecting a Client
 * Creating Messages
 * Sending Messages
+* Exchanging Messages
 * Queuing Messages
 * Broadcasting Messages
 * Secure Communication
@@ -102,6 +103,21 @@ exampleMessage = new ExampleMessage (responseMessage);
 System.out.println ("Server response: " + exampleMessage.getString ("server_response"));
 ```
 
+## Exchanging Messages ##
+
+Exchanging a message will send a message and update the original message with the response message given. Useful when the request and response message are the same class as it avoids unnessecary casting like when sending messages.
+
+To create and exchange a BasicMessage to the server from client
+```java
+ExampleMessage exampleMessage = new ExampleMessage ();
+exampleMessage.setString ("client_message", "example_client_message");
+if (client.exchangeMessage (exampleMessage)) {
+	//output server response
+	System.out.println (exampleMessage.getString ("server_response"));
+} else {
+	System.out.println ("Request timed out!");
+}
+```
 
 ## Queuing Messages ##
 
