@@ -39,7 +39,7 @@ public class ExampleHandler extends BasicHandler
 
 	@Override
 	public BeamMessage messageRecieved (Communicator comm, BasicMessage msg) {
-		System.out.println ("Client sent msg: " + msg.getString ("client_message"));
+		System.out.println ("Client sent message: " + msg.getString ("client_message"));
 
 		//response message
 		return msg.emptyResponse ().setString ("server_response", "example_reply_message");
