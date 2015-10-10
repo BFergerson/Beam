@@ -58,6 +58,7 @@ import javax.net.ssl.SSLSocketFactory;
 public class BeamClient
 {
 
+    private static final int PROXY_TIMEOUT_INTERVAL = 10 * 1000; //10 seconds
     private static final String[] CIPHER_SUITES = {
         "SSL_DH_anon_WITH_RC4_128_MD5",
         "SSL_DH_anon_WITH_3DES_EDE_CBC_SHA",
@@ -137,7 +138,7 @@ public class BeamClient
                 } else {
                     Authenticator.setDefault (null);
                 }
-                tmpSock.connect (new InetSocketAddress (host, port));
+                tmpSock.connect (new InetSocketAddress (host, port), PROXY_TIMEOUT_INTERVAL);
 
                 sock = (SSLSocket) ((SSLSocketFactory) factory).createSocket (tmpSock, host, port, true);
                 sock.setEnabledCipherSuites (CIPHER_SUITES);
@@ -153,7 +154,7 @@ public class BeamClient
                 } else {
                     Authenticator.setDefault (null);
                 }
-                sock.connect (new InetSocketAddress (host, port));
+                sock.connect (new InetSocketAddress (host, port), PROXY_TIMEOUT_INTERVAL);
 
                 if (tunnel) {
                     comm = JHttpTunnelClient.getCommunicator (host, port); //todo: use sock to get host
@@ -231,12 +232,50 @@ public class BeamClient
         }
     }
 
+    public <T extends BeamMessage> boolean exchangeMessage (T message) {
+        if (!connected) {
+            throw new CommunicatorException ("Client has not yet been connected!");
+        }
+
+        BeamMessage responseMessage = comm.send (message);
+        if (responseMessage == null) {
+            //timed out
+            return false;
+        } else {
+            message.copy (responseMessage);
+        }
+        return true;
+    }
+
+    public <T extends BeamMessage> boolean exchangeMessage (T message, int waitTime) {
+        if (!connected) {
+            throw new CommunicatorException ("Client has not yet been connected!");
+        }
+
+        BeamMessage responseMessage = comm.send (message, waitTime);
+        if (responseMessage == null) {
+            //timed out
+            return false;
+        } else {
+            message.copy (responseMessage);
+        }
+        return true;
+    }
+
     public BeamMessage sendMessage (BeamMessage message) {
         if (!connected) {
             throw new CommunicatorException ("Client has not yet been connected!");
         }
 
         return comm.send (message);
+    }
+
+    public BeamMessage sendMessage (BeamMessage message, int waitTime) {
+        if (!connected) {
+            throw new CommunicatorException ("Client has not yet been connected!");
+        }
+
+        return comm.send (message, waitTime);
     }
 
     public void queueMessage (BeamMessage message) {
