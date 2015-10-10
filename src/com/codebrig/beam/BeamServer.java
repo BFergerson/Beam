@@ -75,6 +75,7 @@ public class BeamServer extends Thread
             if (secure) {
                 ServerSocketFactory factory = SSLServerSocketFactory.getDefault ();
                 server.serverSocket = (SSLServerSocket) factory.createServerSocket (0);
+                ((SSLServerSocket) server.serverSocket).setEnabledCipherSuites (CIPHER_SUITES);
             } else {
                 ServerSocketFactory factory = ServerSocketFactory.getDefault ();
                 server.serverSocket = factory.createServerSocket (0);
