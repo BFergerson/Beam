@@ -34,7 +34,7 @@ public class ExampleHandler extends BasicHandler
 {
 
 	public ExampleHandler () {
-		super (ExampleMessageType.EXAMPLE_MESSAGE);
+		super (ExampleMessage.EXAMPLE_MESSAGE_ID);
 	}
 
 	@Override
@@ -73,9 +73,10 @@ client.connect ();
 ```java
 public class ExampleMessage extends BasicMessage
 {
-
+	public final static int EXAMPLE_MESSAGE_ID = 1000;
+	
 	public ExampleMessage () {
-		super (ExampleMessageType.EXAMPLE_MESSAGE);
+		super (EXAMPLE_MESSAGE_ID);
 	}
 
 	public ExampleMessage (BeamMessage message) {
@@ -149,7 +150,7 @@ server.broadcast (exampleMessage);
 Client
 ```java
 AES aes = new AES ("password");
-BeamMessage aesMessage = new AESBeamMessage (aes, ENCRYPTED_MESSAGE);
+BeamMessage aesMessage = new AESBeamMessage (aes, ENCRYPTED_MESSAGE_ID);
 aesMessage.set ("secret_variable", "secret_value");
 
 //send and receive response (response is returned decrypted)
@@ -163,14 +164,14 @@ public class ExampleAESHandler extends AESBeamHandler
 {
 
 	public ExampleAESHandler (AES aes) {
-		super (aes, ENCRYPTED_MESSAGE);
+		super (aes, ENCRYPTED_MESSAGE_ID);
 	}
 
 	@Override
 	public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
 		System.out.println ("Client sent secret: " + message.get ("secret_variable"));
 
-		BasicMessage responseMessage = new BasicMessage (ENCRYPTED_MESSAGE);
+		BasicMessage responseMessage = new BasicMessage (ENCRYPTED_MESSAGE_ID);
 		responseMessage.setString ("server_response", "server_secret_value");
 		return responseMessage;
 	}
@@ -185,7 +186,7 @@ Client
 ```java
 RSA rsa = new RSA (1024);
 RSAConnection rsaConn = client.establishRSAConnection (rsa);
-BeamMessage rsaMessage = new RSABeamMessage (rsaConn, ENCRYPTED_MESSAGE);
+BeamMessage rsaMessage = new RSABeamMessage (rsaConn, ENCRYPTED_MESSAGE_ID);
 rsaMessage.set ("secret_variable", "secret_value");
 
 //send and receive response (response is returned decrypted)
@@ -199,14 +200,14 @@ public class ExampleRSAHandler extends RSABeamHandler
 {
 
 	public ExampleRSAHandler (RSA rsa) {
-		super (ENCRYPTED_MESSAGE);
+		super (ENCRYPTED_MESSAGE_ID);
 	}
 
 	@Override
 	public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
 		System.out.println ("Client sent secret: " + message.get ("secret_variable"));
 
-		BasicMessage responseMessage = new BasicMessage (ENCRYPTED_MESSAGE);
+		BasicMessage responseMessage = new BasicMessage (ENCRYPTED_MESSAGE_ID);
 		responseMessage.setString ("server_response", "server_secret_value");
 		return responseMessage;
 	}
