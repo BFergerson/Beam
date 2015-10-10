@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -51,15 +52,15 @@ public class BeamMessage<T extends BeamMessage>
 
     public static final int HEADER_SIZE = 20;
 
-    private final boolean systemMessage;
-    private final int type;
-    private final byte[] data;
-    private final HashMap<String, List<String>> messageMap;
-    private final long createdTimestamp;
-    private long sentTimestamp;
-    private long receivedTimestamp;
-    private boolean rawData = false;
-    private long messageId = -1;
+    protected boolean systemMessage;
+    protected int type;
+    protected byte[] data;
+    protected HashMap<String, List<String>> messageMap;
+    protected long createdTimestamp;
+    protected long sentTimestamp;
+    protected long receivedTimestamp;
+    protected boolean rawData = false;
+    protected long messageId = -1;
 
     /**
      * Data message constructor
@@ -86,7 +87,7 @@ public class BeamMessage<T extends BeamMessage>
         this.data = null;
         this.type = type;
         this.systemMessage = type < 0;
-        this.messageMap = new HashMap<String, List<String>> ();
+        this.messageMap = new HashMap<> ();
         this.createdTimestamp = System.currentTimeMillis ();
     }
 
@@ -112,7 +113,7 @@ public class BeamMessage<T extends BeamMessage>
 
         this.type = type;
         this.systemMessage = type < 0;
-        this.messageMap = new HashMap<String, List<String>> ();
+        this.messageMap = new HashMap<> ();
         this.createdTimestamp = System.currentTimeMillis ();
 
         if (parse) {
@@ -159,7 +160,7 @@ public class BeamMessage<T extends BeamMessage>
 
         this.type = message.getType ();
         this.systemMessage = type < 0;
-        this.messageMap = new HashMap<String, List<String>> ();
+        this.messageMap = new HashMap<> ();
         this.createdTimestamp = System.currentTimeMillis ();
         this.rawData = rawData;
 
@@ -575,6 +576,11 @@ public class BeamMessage<T extends BeamMessage>
         return getString ("error_message");
     }
 
+    public boolean hasErrorMessage () {
+        String errorMessage = getString ("error_message");
+        return errorMessage != null && !errorMessage.isEmpty ();
+    }
+
     public boolean isRawData () {
         return rawData;
     }
@@ -584,12 +590,28 @@ public class BeamMessage<T extends BeamMessage>
         return (T) this;
     }
 
-    public T copy () {
-        return (T) new BeamMessage (this);
+    public T copy (T message) {
+        clear ();
+        this.systemMessage = message.systemMessage;
+        this.type = message.type;
+
+        this.data = (message.data != null) ? Arrays.copyOf (message.data, message.data.length) : null;
+        this.messageMap = new HashMap<> (message.messageMap);
+        for (String key : messageMap.keySet ()) {
+            List<String> strList = messageMap.get (key);
+            messageMap.put (key, new ArrayList<> (strList));
+        }
+
+        this.createdTimestamp = message.createdTimestamp;
+        this.sentTimestamp = message.sentTimestamp;
+        this.receivedTimestamp = message.receivedTimestamp;
+        this.rawData = message.rawData;
+        this.messageId = message.messageId;
+        return (T) this;
     }
 
     public T response () {
-        return copy ();
+        return (T) this;
     }
 
     public T emptyResponse () {
