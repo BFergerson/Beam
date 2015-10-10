@@ -138,7 +138,7 @@ aesMessage.set ("secret_variable", "secret_value");
 
 //send and receive response (response is returned decrypted)
 BeamMessage responseMessage = client.sendMessage (aesMessage);
-System.out.println ("Server response: " + responseMessage .get ("server_response");
+System.out.println ("Server response: " + responseMessage.get ("server_response");
 ```
 
 Server
