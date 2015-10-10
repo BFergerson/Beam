@@ -207,8 +207,8 @@ public class BasicMessage<T extends BasicMessage> extends BeamMessage<T>
     }
 
     @Override
-    public T copy () {
-        return super.copy ();
+    public T copy (T message) {
+        return super.copy (message);
     }
 
     @Override
