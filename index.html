@@ -1,48 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta charset="UTF-8">
     <title>Beam by CodeBrig</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
-    <div id="container">
-      <div class="inner">
+    <section class="page-header">
+      <h1 class="project-name">Beam</h1>
+      <h2 class="project-tagline">Client/Server &amp; P2P Networking Library</h2>
+      <a href="https://github.com/CodeBrig/Beam" class="btn">View on GitHub</a>
+      <a href="https://github.com/CodeBrig/Beam/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/CodeBrig/Beam/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <header>
-          <h1>Beam</h1>
-          <h2>Client/Server &amp; P2P Networking Library</h2>
-        </header>
-
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/CodeBrig/Beam/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/CodeBrig/Beam/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/CodeBrig/Beam" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
-
-        <hr>
-
-        <section id="main_content">
-          <p>Beam is client/server and peer-to-peer compatible networking library. It provides the ability to create large network systems with ease using language-independent messaging protocols. With Beam you can create a server to handle many concurrent connections as well as connect clients to each other for P2P connections. Beam provides the ability for P2P connections through UDP hole punching and UPnP. Message serialization is currently performed by Google's Protocol Buffers (MessagePack and others will be available soon). </p>
+    <section class="main-content">
+      <p>Beam is client/server and peer-to-peer compatible networking library. It provides the ability to create large network systems with ease using language-independent messaging protocols. With Beam you can create a server to handle many concurrent connections as well as connect clients to each other for P2P connections. Beam provides the ability for P2P connections through UDP hole punching and UPnP. Message serialization is currently performed by Google's Protocol Buffers (MessagePack and others will be available soon). </p>
 
 <h2>
 <a id="overview" class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h2>
 
 <ul>
 <li>Creating a Server</li>
-<li>Message Types</li>
 <li>Message Handlers</li>
 <li>Connecting a Client</li>
 <li>Creating Messages</li>
 <li>Sending Messages</li>
+<li>Exchanging Messages</li>
 <li>Queuing Messages</li>
 <li>Broadcasting Messages</li>
 <li>Secure Communication
@@ -66,7 +54,7 @@
 
 <p>This code starts a server on TCP port 45800</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">BeamServer</span> server <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BeamServer</span> (<span class="pl-c1">45800</span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">BeamServer</span> server <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BeamServer</span> (<span class="pl-c1">45800</span>);
 server<span class="pl-k">.</span>start ();</pre></div>
 
 <h2>
@@ -74,20 +62,19 @@ server<span class="pl-k">.</span>start ();</pre></div>
 
 <p>A Beam server works with message handlers. Each handler has the ability to accept one or more different types of messages</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-en">ExampleHandler</span> <span class="pl-s">extends</span> <span class="pl-e">BasicHandler</span>
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ExampleHandler</span> <span class="pl-k">extends</span> <span class="pl-e">BasicHandler</span>
 {
 
-    <span class="pl-s">public</span> <span class="pl-en">ExampleHandler</span> () {
-        <span class="pl-v">super</span> (<span class="pl-stj">ExampleMessageType</span><span class="pl-c1"><span class="pl-k">.</span>EXAMPLE_MESSAGE</span>);
+    <span class="pl-k">public</span> <span class="pl-en">ExampleHandler</span> () {
+        <span class="pl-v">super</span> (<span class="pl-smi">ExampleMessage</span><span class="pl-c1"><span class="pl-k">.</span>EXAMPLE_MESSAGE_ID</span>);
     }
 
-    <span class="pl-st">@Override</span>
-    <span class="pl-s">public</span> <span class="pl-stj">BeamMessage</span> <span class="pl-en">messageRecieved</span> (<span class="pl-stj">Communicator</span> <span class="pl-v">comm</span>, <span class="pl-stj">BasicMessage</span> <span class="pl-v">message</span>) {
-        <span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Client sent message: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> message<span class="pl-k">.</span>getString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">BeamMessage</span> <span class="pl-en">messageRecieved</span> (<span class="pl-smi">Communicator</span> <span class="pl-v">comm</span>, <span class="pl-smi">BasicMessage</span> <span class="pl-v">msg</span>) {
+        <span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Client sent message: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> msg<span class="pl-k">.</span>getString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));
 
         <span class="pl-c">//response message</span>
-        message<span class="pl-k">.</span>clear ();
-        <span class="pl-k">return</span> message<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>example_reply_message<span class="pl-pds">"</span></span>);
+        <span class="pl-k">return</span> msg<span class="pl-k">.</span>emptyResponse ()<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>example_reply_message<span class="pl-pds">"</span></span>);
     }
 }</pre></div>
 
@@ -95,7 +82,7 @@ server<span class="pl-k">.</span>start ();</pre></div>
 
 <p>Now that you have created a handler you will need to add that handler to the server.</p>
 
-<div class="highlight highlight-java"><pre>server<span class="pl-k">.</span>addHandler (<span class="pl-stj">ExampleHandler</span><span class="pl-k">.</span>class);</pre></div>
+<div class="highlight highlight-source-java"><pre>server<span class="pl-k">.</span>addHandler (<span class="pl-smi">ExampleHandler</span><span class="pl-k">.</span>class);</pre></div>
 
 <p>Note: Add handlers to server before starting to ensure it receives all messages.</p>
 
@@ -106,20 +93,21 @@ server<span class="pl-k">.</span>start ();</pre></div>
 
 <p>This code connects a client to a server at 127.0.0.1 on TCP port 45800</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">BeamClient</span> client <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BeamClient</span> (<span class="pl-c1">127.0</span><span class="pl-k">.</span><span class="pl-c1">0.1</span>, <span class="pl-c1">45800</span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">BeamClient</span> client <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BeamClient</span> (<span class="pl-c1">127.0</span><span class="pl-k">.</span><span class="pl-c1">0.1</span>, <span class="pl-c1">45800</span>);
 client<span class="pl-k">.</span>connect ();</pre></div>
 
 <h2>
 <a id="creating-messages" class="anchor" href="#creating-messages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating Messages</h2>
 
-<div class="highlight highlight-java"><pre><span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-en">ExampleMessage</span> <span class="pl-s">extends</span> <span class="pl-e">BasicMessage</span>
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ExampleMessage</span> <span class="pl-k">extends</span> <span class="pl-e">BasicMessage</span>
 {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">static</span> <span class="pl-k">int</span> <span class="pl-c1">EXAMPLE_MESSAGE_ID</span> <span class="pl-k">=</span> <span class="pl-c1">1000</span>;
 
-    <span class="pl-s">public</span> <span class="pl-en">ExampleMessage</span> () {
-        <span class="pl-v">super</span> (<span class="pl-stj">ExampleMessageType</span><span class="pl-c1"><span class="pl-k">.</span>EXAMPLE_MESSAGE</span>);
+    <span class="pl-k">public</span> <span class="pl-en">ExampleMessage</span> () {
+        <span class="pl-v">super</span> (<span class="pl-c1">EXAMPLE_MESSAGE_ID</span>);
     }
 
-    <span class="pl-s">public</span> <span class="pl-en">ExampleMessage</span> (<span class="pl-stj">BeamMessage</span> <span class="pl-v">message</span>) {
+    <span class="pl-k">public</span> <span class="pl-en">ExampleMessage</span> (<span class="pl-smi">BeamMessage</span> <span class="pl-v">message</span>) {
         <span class="pl-v">super</span> (message);
     }
 
@@ -135,13 +123,29 @@ client<span class="pl-k">.</span>connect ();</pre></div>
 
 <p>To create and send a BasicMessage to the server from client</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">ExampleMessage</span> exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ExampleMessage</span> ();
-exampleMessage<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>example_client_message<span class="pl-pds">"</span></span>);
-<span class="pl-stj">BeamMessage</span> responseMessage <span class="pl-k">=</span> client<span class="pl-k">.</span>sendMessage (exampleMessage);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ExampleMessage</span> exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">ExampleMessage</span> ();
+exampleMessage<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>example_client_message<span class="pl-pds">"</span></span>);
+<span class="pl-smi">BeamMessage</span> responseMessage <span class="pl-k">=</span> client<span class="pl-k">.</span>sendMessage (exampleMessage);
 
 <span class="pl-c">//convert and output server response</span>
-exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ExampleMessage</span> (responseMessage);
-<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Server response: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> exampleMessage<span class="pl-k">.</span>getString (<span class="pl-s1"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>);</pre></div>
+exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">ExampleMessage</span> (responseMessage);
+<span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Server response: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> exampleMessage<span class="pl-k">.</span>getString (<span class="pl-s"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>));</pre></div>
+
+<h2>
+<a id="exchanging-messages" class="anchor" href="#exchanging-messages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Exchanging Messages</h2>
+
+<p>Exchanging a message will send a message and update the original message with the response message given. Useful when the request and response message are the same class as it avoids unnessecary casting like when sending messages.</p>
+
+<p>To create and exchange a BasicMessage to the server from client</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ExampleMessage</span> exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">ExampleMessage</span> ();
+exampleMessage<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>example_client_message<span class="pl-pds">"</span></span>);
+<span class="pl-k">if</span> (client<span class="pl-k">.</span>exchangeMessage (exampleMessage)) {
+    <span class="pl-c">//output server response</span>
+    <span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (exampleMessage<span class="pl-k">.</span>getString (<span class="pl-s"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>));
+} <span class="pl-k">else</span> {
+    <span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Request timed out!<span class="pl-pds">"</span></span>);
+}</pre></div>
 
 <h2>
 <a id="queuing-messages" class="anchor" href="#queuing-messages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Queuing Messages</h2>
@@ -150,8 +154,8 @@ exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span c
 
 <p>To create and queue a BasicMessage to the server from client</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">ExampleMessage</span> exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ExampleMessage</span> ();
-exampleMessage<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>example_client_message<span class="pl-pds">"</span></span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ExampleMessage</span> exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">ExampleMessage</span> ();
+exampleMessage<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>example_client_message<span class="pl-pds">"</span></span>);
 
 <span class="pl-c">//queue message. no need to wait for response</span>
 client<span class="pl-k">.</span>queueMessage (exampleMessage);</pre></div>
@@ -161,8 +165,8 @@ client<span class="pl-k">.</span>queueMessage (exampleMessage);</pre></div>
 
 <p>As a server you can broadcast messages to all connected clients</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">ExampleMessage</span> exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">ExampleMessage</span> ();
-exampleMessage<span class="pl-k">.</span>setString(<span class="pl-s1"><span class="pl-pds">"</span>example_broadcast<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>test_value<span class="pl-pds">"</span></span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ExampleMessage</span> exampleMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">ExampleMessage</span> ();
+exampleMessage<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>example_broadcast<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>test_value<span class="pl-pds">"</span></span>);
 
 server<span class="pl-k">.</span>broadcast (exampleMessage);</pre></div>
 
@@ -174,29 +178,29 @@ server<span class="pl-k">.</span>broadcast (exampleMessage);</pre></div>
 
 <p>Client</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">AES</span> aes <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">AES</span> (<span class="pl-s1"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>);
-<span class="pl-stj">BeamMessage</span> aesMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">AESBeamMessage</span> (aes, <span class="pl-c1">ENCRYPTED_MESSAGE</span>);
-aesMessage<span class="pl-k">.</span>set (<span class="pl-s1"><span class="pl-pds">"</span>secret_variable<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>secret_value<span class="pl-pds">"</span></span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">AES</span> aes <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">AES</span> (<span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>);
+<span class="pl-smi">BeamMessage</span> aesMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">AESBeamMessage</span> (aes, <span class="pl-c1">ENCRYPTED_MESSAGE_ID</span>);
+aesMessage<span class="pl-k">.</span>set (<span class="pl-s"><span class="pl-pds">"</span>secret_variable<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>secret_value<span class="pl-pds">"</span></span>);
 
 <span class="pl-c">//send and receive response (response is returned decrypted)</span>
-<span class="pl-stj">BeamMessage</span> responseMessage <span class="pl-k">=</span> client<span class="pl-k">.</span>getCommunicator ()<span class="pl-k">.</span>send (aesMessage);
-<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Server response: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> responseMessage .get (<span class="pl-s1"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>);</pre></div>
+<span class="pl-smi">BeamMessage</span> responseMessage <span class="pl-k">=</span> client<span class="pl-k">.</span>sendMessage (aesMessage);
+<span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Server response: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> responseMessage<span class="pl-k">.</span>get (<span class="pl-s"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>);</pre></div>
 
 <p>Server</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-en">ExampleAESHandler</span> <span class="pl-s">extends</span> <span class="pl-e">AESBeamHandler</span>
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ExampleAESHandler</span> <span class="pl-k">extends</span> <span class="pl-e">AESBeamHandler</span>
 {
 
-    <span class="pl-s">public</span> <span class="pl-en">ExampleAESHandler</span> (<span class="pl-stj">AES</span> <span class="pl-v">aes</span>) {
-        <span class="pl-v">super</span> (aes, <span class="pl-c1">ENCRYPTED_MESSAGE</span>);
+    <span class="pl-k">public</span> <span class="pl-en">ExampleAESHandler</span> (<span class="pl-smi">AES</span> <span class="pl-v">aes</span>) {
+        <span class="pl-v">super</span> (aes, <span class="pl-c1">ENCRYPTED_MESSAGE_ID</span>);
     }
 
-    <span class="pl-st">@Override</span>
-    <span class="pl-s">public</span> <span class="pl-stj">BeamMessage</span> <span class="pl-en">messageRecieved</span> (<span class="pl-stj">Communicator</span> <span class="pl-v">comm</span>, <span class="pl-stj">BeamMessage</span> <span class="pl-v">message</span>) {
-        <span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Client sent secret: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> message<span class="pl-k">.</span>get (<span class="pl-s1"><span class="pl-pds">"</span>secret_variable<span class="pl-pds">"</span></span>));
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">BeamMessage</span> <span class="pl-en">messageRecieved</span> (<span class="pl-smi">Communicator</span> <span class="pl-v">comm</span>, <span class="pl-smi">BeamMessage</span> <span class="pl-v">message</span>) {
+        <span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Client sent secret: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> message<span class="pl-k">.</span>get (<span class="pl-s"><span class="pl-pds">"</span>secret_variable<span class="pl-pds">"</span></span>));
 
-        <span class="pl-stj">BasicMessage</span> responseMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BasicMessage</span> (<span class="pl-c1">ENCRYPTED_MESSAGE</span>);
-        responseMessage<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>server_secret_value<span class="pl-pds">"</span></span>);
+        <span class="pl-smi">BasicMessage</span> responseMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BasicMessage</span> (<span class="pl-c1">ENCRYPTED_MESSAGE_ID</span>);
+        responseMessage<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>server_secret_value<span class="pl-pds">"</span></span>);
         <span class="pl-k">return</span> responseMessage;
     }
 
@@ -207,30 +211,30 @@ aesMessage<span class="pl-k">.</span>set (<span class="pl-s1"><span class="pl-pd
 
 <p>Client</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">RSA</span> rsa <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">RSA</span> (<span class="pl-c1">1024</span>);
-<span class="pl-stj">RSAConnection</span> rsaConn <span class="pl-k">=</span> client<span class="pl-k">.</span>establishRSAConnection (rsa);
-<span class="pl-stj">BeamMessage</span> rsaMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">RSABeamMessage</span> (rsaConn, <span class="pl-c1">ENCRYPTED_MESSAGE</span>);
-rsaMessage<span class="pl-k">.</span>set (<span class="pl-s1"><span class="pl-pds">"</span>secret_variable<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>secret_value<span class="pl-pds">"</span></span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">RSA</span> rsa <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">RSA</span> (<span class="pl-c1">1024</span>);
+<span class="pl-smi">RSAConnection</span> rsaConn <span class="pl-k">=</span> client<span class="pl-k">.</span>establishRSAConnection (rsa);
+<span class="pl-smi">BeamMessage</span> rsaMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">RSABeamMessage</span> (rsaConn, <span class="pl-c1">ENCRYPTED_MESSAGE_ID</span>);
+rsaMessage<span class="pl-k">.</span>set (<span class="pl-s"><span class="pl-pds">"</span>secret_variable<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>secret_value<span class="pl-pds">"</span></span>);
 
 <span class="pl-c">//send and receive response (response is returned decrypted)</span>
-<span class="pl-stj">BeamMessage</span> responseMessage <span class="pl-k">=</span> client<span class="pl-k">.</span>getCommunicator ()<span class="pl-k">.</span>send (rsaMessage);
-<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Server response: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> responseMessage<span class="pl-k">.</span>get (<span class="pl-s1"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>);</pre></div>
+<span class="pl-smi">BeamMessage</span> responseMessage <span class="pl-k">=</span> client<span class="pl-k">.</span>sendMessage (rsaMessage);
+<span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Server response: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> responseMessage<span class="pl-k">.</span>get (<span class="pl-s"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>);</pre></div>
 
 <p>Server</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-en">ExampleRSAHandler</span> <span class="pl-s">extends</span> <span class="pl-e">RSABeamHandler</span>
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">ExampleRSAHandler</span> <span class="pl-k">extends</span> <span class="pl-e">RSABeamHandler</span>
 {
 
-    <span class="pl-s">public</span> <span class="pl-en">ExampleRSAHandler</span> (<span class="pl-stj">RSA</span> <span class="pl-v">rsa</span>) {
-        <span class="pl-v">super</span> (<span class="pl-c1">ENCRYPTED_MESSAGE</span>);
+    <span class="pl-k">public</span> <span class="pl-en">ExampleRSAHandler</span> (<span class="pl-smi">RSA</span> <span class="pl-v">rsa</span>) {
+        <span class="pl-v">super</span> (<span class="pl-c1">ENCRYPTED_MESSAGE_ID</span>);
     }
 
-    <span class="pl-st">@Override</span>
-    <span class="pl-s">public</span> <span class="pl-stj">BeamMessage</span> <span class="pl-en">messageRecieved</span> (<span class="pl-stj">Communicator</span> <span class="pl-v">comm</span>, <span class="pl-stj">BeamMessage</span> <span class="pl-v">message</span>) {
-        <span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Client sent secret: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> message<span class="pl-k">.</span>get (<span class="pl-s1"><span class="pl-pds">"</span>secret_variable<span class="pl-pds">"</span></span>));
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">BeamMessage</span> <span class="pl-en">messageRecieved</span> (<span class="pl-smi">Communicator</span> <span class="pl-v">comm</span>, <span class="pl-smi">BeamMessage</span> <span class="pl-v">message</span>) {
+        <span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Client sent secret: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> message<span class="pl-k">.</span>get (<span class="pl-s"><span class="pl-pds">"</span>secret_variable<span class="pl-pds">"</span></span>));
 
-        <span class="pl-stj">BasicMessage</span> responseMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BasicMessage</span> (<span class="pl-c1">ENCRYPTED_MESSAGE</span>);
-        responseMessage<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>server_secret_value<span class="pl-pds">"</span></span>);
+        <span class="pl-smi">BasicMessage</span> responseMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BasicMessage</span> (<span class="pl-c1">ENCRYPTED_MESSAGE_ID</span>);
+        responseMessage<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>server_response<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>server_secret_value<span class="pl-pds">"</span></span>);
         <span class="pl-k">return</span> responseMessage;
     }
 
@@ -238,7 +242,7 @@ rsaMessage<span class="pl-k">.</span>set (<span class="pl-s1"><span class="pl-pd
 
 <p>Note: Server must add a RSAHandshakeHandler with the private RSA</p>
 
-<div class="highlight highlight-java"><pre>server<span class="pl-k">.</span>addRSAHandshakeHandler (<span class="pl-k">new</span> <span class="pl-stj">RSAHandshakeHandler</span> (rsa));</pre></div>
+<div class="highlight highlight-source-java"><pre>server<span class="pl-k">.</span>addRSAHandshakeHandler (<span class="pl-k">new</span> <span class="pl-smi">RSAHandshakeHandler</span> (rsa));</pre></div>
 
 <h2>
 <a id="p2p-connection" class="anchor" href="#p2p-connection" aria-hidden="true"><span class="octicon octicon-link"></span></a>P2P Connection</h2>
@@ -248,78 +252,76 @@ rsaMessage<span class="pl-k">.</span>set (<span class="pl-s1"><span class="pl-pd
 
 <p>Client A</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-c">//opens TCP port 45800 on Client A</span>
-<span class="pl-stj">UPNPControl</span> upnpControl <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">UPNPControl</span> (<span class="pl-stj">ConnectionProtocol</span><span class="pl-c1"><span class="pl-k">.</span>TCP</span>);
-upnpControl<span class="pl-k">.</span>addPortMapping (<span class="pl-s1"><span class="pl-pds">"</span>Example UPNP Connection<span class="pl-pds">"</span></span>, <span class="pl-c1">45800</span>, <span class="pl-c1">45800</span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-c">//opens TCP port 45800 on Client A</span>
+<span class="pl-smi">UPNPControl</span> upnpControl <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">UPNPControl</span> (<span class="pl-smi">ConnectionProtocol</span><span class="pl-c1"><span class="pl-k">.</span>TCP</span>);
+upnpControl<span class="pl-k">.</span>addPortMapping (<span class="pl-s"><span class="pl-pds">"</span>Example UPNP Connection<span class="pl-pds">"</span></span>, <span class="pl-c1">45800</span>, <span class="pl-c1">45800</span>);
 
 <span class="pl-c">//receive message from Client B</span>
-<span class="pl-stj">BeamMessage</span> message <span class="pl-k">=</span> peerComm<span class="pl-k">.</span>fetchWithWait (<span class="pl-stj">Communicator</span><span class="pl-c1"><span class="pl-k">.</span>WAIT_FOREVER</span>, <span class="pl-c1">EXAMPLE_UPNP_MESSAGE</span>);
-<span class="pl-stj">BasicMessage</span> basicMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BasicMessage</span> (message);
-<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Client B sent: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> basicMessage<span class="pl-k">.</span>getString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));
+<span class="pl-smi">BeamMessage</span> message <span class="pl-k">=</span> peerComm<span class="pl-k">.</span>fetchWithWait (<span class="pl-smi">Communicator</span><span class="pl-c1"><span class="pl-k">.</span>WAIT_FOREVER</span>, <span class="pl-c1">EXAMPLE_UPNP_MESSAGE</span>);
+<span class="pl-smi">BasicMessage</span> basicMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BasicMessage</span> (message);
+<span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Client B sent: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> basicMessage<span class="pl-k">.</span>getString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));
 
-<span class="pl-c">//send response to Client B</span>
-basicMessage<span class="pl-k">.</span>clear ();
-basicMessage<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Hello from Client A!<span class="pl-pds">"</span></span>);</pre></div>
+<span class="pl-c">//queue response to Client B</span>
+peerComm<span class="pl-k">.</span>queue (basicMessage<span class="pl-k">.</span>emptyResponse ()<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Hello from Client A!<span class="pl-pds">"</span></span>));</pre></div>
 
 <p>Client B</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-c">//connect to client A directly on port 45800 (which is open via UPNP)</span>
-<span class="pl-stj">BeamClient</span> client <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BeamClient</span> (<span class="pl-c1">CLIENT_IP_ADDRESS</span>, <span class="pl-c1">45800</span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-c">//connect to client A directly on port 45800 (which is open via UPNP)</span>
+<span class="pl-smi">BeamClient</span> client <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BeamClient</span> (<span class="pl-c1">CLIENT_IP_ADDRESS</span>, <span class="pl-c1">45800</span>);
 client<span class="pl-k">.</span>connect ();
 
 <span class="pl-c">//send message to Client A</span>
-<span class="pl-stj">BasicMessage</span> message <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BasicMessage</span> (<span class="pl-c1">EXAMPLE_UPNP_MESSAGE</span>);
-message<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Hello from Client B!<span class="pl-pds">"</span></span>);
-<span class="pl-stj">BeamMessage</span> rtnMessage <span class="pl-k">=</span> peerComm<span class="pl-k">.</span>send (message);
+<span class="pl-smi">BasicMessage</span> message <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BasicMessage</span> (<span class="pl-c1">EXAMPLE_UPNP_MESSAGE</span>);
+message<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Hello from Client B!<span class="pl-pds">"</span></span>);
+<span class="pl-smi">BeamMessage</span> rtnMessage <span class="pl-k">=</span> peerComm<span class="pl-k">.</span>send (message);
 
 <span class="pl-c">//convert and output Client A response</span>
-message <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BasicMessage</span> (rtnMessage);
-<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Client A sent: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> basicMessage<span class="pl-k">.</span>getString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));</pre></div>
+message <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BasicMessage</span> (rtnMessage);
+<span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Client A sent: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> basicMessage<span class="pl-k">.</span>getString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));</pre></div>
 
 <h3>
 <a id="udp-hole-punching" class="anchor" href="#udp-hole-punching" aria-hidden="true"><span class="octicon octicon-link"></span></a>UDP Hole Punching</h3>
 
 <p>Client A</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">UDPHoleClient</span> holeClient <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">UDPHoleClient</span> (<span class="pl-c1">PUNCH_SERVER_HOST</span>, <span class="pl-c1">PUNCH_SERVER_PORT</span>);
-<span class="pl-stj">Communicator</span> peerComm <span class="pl-k">=</span> holeClient<span class="pl-k">.</span>createHoleCommunicator (<span class="pl-c1">PEER_IDENTIFIER</span>, <span class="pl-c1">PEER_ACCESS_CODE</span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">UDPHoleClient</span> holeClient <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">UDPHoleClient</span> (<span class="pl-c1">PUNCH_SERVER_HOST</span>, <span class="pl-c1">PUNCH_SERVER_PORT</span>);
+<span class="pl-smi">Communicator</span> peerComm <span class="pl-k">=</span> holeClient<span class="pl-k">.</span>createHoleCommunicator (<span class="pl-c1">PEER_IDENTIFIER</span>, <span class="pl-c1">PEER_ACCESS_CODE</span>);
 
 <span class="pl-c">//receive message from Client B</span>
-<span class="pl-stj">BeamMessage</span> message <span class="pl-k">=</span> peerComm<span class="pl-k">.</span>fetchWithWait (<span class="pl-stj">Communicator</span><span class="pl-c1"><span class="pl-k">.</span>WAIT_FOREVER</span>, <span class="pl-c1">EXAMPLE_PUNCH_MESSAGE</span>);
-<span class="pl-stj">BasicMessage</span> basicMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BasicMessage</span> (message);
-<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Client B sent: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> basicMessage<span class="pl-k">.</span>getString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));
+<span class="pl-smi">BeamMessage</span> message <span class="pl-k">=</span> peerComm<span class="pl-k">.</span>fetchWithWait (<span class="pl-smi">Communicator</span><span class="pl-c1"><span class="pl-k">.</span>WAIT_FOREVER</span>, <span class="pl-c1">EXAMPLE_PUNCH_MESSAGE</span>);
+<span class="pl-smi">BasicMessage</span> basicMessage <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BasicMessage</span> (message);
+<span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Client B sent: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> basicMessage<span class="pl-k">.</span>getString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));
 
-<span class="pl-c">//send response to Client B</span>
-basicMessage<span class="pl-k">.</span>clear ();
-basicMessage<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Hello from Client A!<span class="pl-pds">"</span></span>);</pre></div>
+<span class="pl-c">//queue response to Client B</span>
+peerComm<span class="pl-k">.</span>queue (basicMessage<span class="pl-k">.</span>emptyResponse ()<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Hello from Client A!<span class="pl-pds">"</span></span>));</pre></div>
 
 <p>Client B</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">UDPPunchClient</span> punchClient <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">UDPPunchClient</span> (<span class="pl-c1">PUNCH_SERVER_HOST</span>, <span class="pl-c1">PUNCH_SERVER_PORT</span>);
-<span class="pl-stj">Communicator</span> peerComm <span class="pl-k">=</span> punchClient<span class="pl-k">.</span>punchPeerCommunicator (<span class="pl-c1">PEER_IDENTIFIER</span>, <span class="pl-c1">PEER_ACCESS_CODE</span>);
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">UDPPunchClient</span> punchClient <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">UDPPunchClient</span> (<span class="pl-c1">PUNCH_SERVER_HOST</span>, <span class="pl-c1">PUNCH_SERVER_PORT</span>);
+<span class="pl-smi">Communicator</span> peerComm <span class="pl-k">=</span> punchClient<span class="pl-k">.</span>punchPeerCommunicator (<span class="pl-c1">PEER_IDENTIFIER</span>, <span class="pl-c1">PEER_ACCESS_CODE</span>);
 
 <span class="pl-k">if</span> (peerComm <span class="pl-k">==</span> <span class="pl-c1">null</span>) {
-    <span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Could not find peer to connect to! Make sure peer is waiting with hole request...<span class="pl-pds">"</span></span>);
+    <span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Could not find peer to connect to! Make sure peer is waiting with hole request...<span class="pl-pds">"</span></span>);
     <span class="pl-k">return</span>;
 }
 
 <span class="pl-c">//send message to Client A</span>
-<span class="pl-stj">BasicMessage</span> message <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BasicMessage</span> (<span class="pl-c1">TEST_PUNCH_MESSAGE_TYPE</span>);
-message<span class="pl-k">.</span>setString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>Hello from Client B!<span class="pl-pds">"</span></span>);
-<span class="pl-stj">BeamMessage</span> rtnMessage <span class="pl-k">=</span> peerComm<span class="pl-k">.</span>send (message);
+<span class="pl-smi">BasicMessage</span> message <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BasicMessage</span> (<span class="pl-c1">TEST_PUNCH_MESSAGE_TYPE</span>);
+message<span class="pl-k">.</span>setString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Hello from Client B!<span class="pl-pds">"</span></span>);
+<span class="pl-smi">BeamMessage</span> rtnMessage <span class="pl-k">=</span> peerComm<span class="pl-k">.</span>send (message);
 
 <span class="pl-c">//convert and output Client A response</span>
-message <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">BasicMessage</span> (rtnMessage);
-<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s1"><span class="pl-pds">"</span>Client A sent: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> basicMessage<span class="pl-k">.</span>getString (<span class="pl-s1"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));</pre></div>
-        </section>
+message <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BasicMessage</span> (rtnMessage);
+<span class="pl-smi">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println (<span class="pl-s"><span class="pl-pds">"</span>Client A sent: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> basicMessage<span class="pl-k">.</span>getString (<span class="pl-s"><span class="pl-pds">"</span>client_message<span class="pl-pds">"</span></span>));</pre></div>
 
-        <footer>
-          Beam is maintained by <a href="https://github.com/CodeBrig">CodeBrig</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/CodeBrig/Beam">Beam</a> is maintained by <a href="https://github.com/CodeBrig">CodeBrig</a>.</span>
 
-        
-      </div>
-    </div>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
   </body>
 </html>
