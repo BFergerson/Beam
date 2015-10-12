@@ -46,7 +46,6 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
-
 import net.rudp.impl.ACKSegment;
 import net.rudp.impl.DATSegment;
 import net.rudp.impl.EAKSegment;

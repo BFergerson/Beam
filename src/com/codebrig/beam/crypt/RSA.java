@@ -29,8 +29,8 @@
  */
 package com.codebrig.beam.crypt;
 
-import com.codebrig.beam.utils.Checksum;
 import com.codebrig.beam.utils.Base64;
+import com.codebrig.beam.utils.Checksum;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.KeyFactory;

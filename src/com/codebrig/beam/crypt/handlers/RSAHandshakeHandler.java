@@ -29,15 +29,15 @@
  */
 package com.codebrig.beam.crypt.handlers;
 
-import com.codebrig.beam.crypt.messages.RSAHandshakeMessage;
-import com.codebrig.beam.messages.BeamMessage;
-import com.codebrig.beam.messages.SystemMessageType;
 import com.codebrig.beam.SystemCommunicator;
-import com.codebrig.beam.handlers.SystemHandler;
 import com.codebrig.beam.crypt.AES;
 import com.codebrig.beam.crypt.RSA;
 import com.codebrig.beam.crypt.RSAConnection;
 import com.codebrig.beam.crypt.RSAConnectionHolder;
+import com.codebrig.beam.crypt.messages.RSAHandshakeMessage;
+import com.codebrig.beam.handlers.SystemHandler;
+import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.SystemMessageType;
 import com.codebrig.beam.utils.Generator;
 
 /**

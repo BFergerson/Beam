@@ -30,10 +30,10 @@
 package com.codebrig.beam.system.handlers;
 
 import com.codebrig.beam.Beam;
-import com.codebrig.beam.messages.BeamMessage;
-import com.codebrig.beam.messages.SystemMessageType;
 import com.codebrig.beam.SystemCommunicator;
 import com.codebrig.beam.handlers.SystemHandler;
+import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.SystemMessageType;
 import com.codebrig.beam.system.messages.HandshakeMessage;
 
 /**

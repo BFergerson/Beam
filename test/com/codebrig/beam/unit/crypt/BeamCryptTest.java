@@ -29,16 +29,16 @@
  */
 package com.codebrig.beam.unit.crypt;
 
-import com.codebrig.beam.crypt.handlers.RSAHandshakeHandler;
-import com.codebrig.beam.crypt.messages.RSABeamMessage;
-import com.codebrig.beam.crypt.messages.AESBeamMessage;
-import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.BeamClient;
-import com.codebrig.beam.Communicator;
 import com.codebrig.beam.BeamServer;
+import com.codebrig.beam.Communicator;
 import com.codebrig.beam.crypt.AES;
 import com.codebrig.beam.crypt.RSA;
 import com.codebrig.beam.crypt.RSAConnection;
+import com.codebrig.beam.crypt.handlers.RSAHandshakeHandler;
+import com.codebrig.beam.crypt.messages.AESBeamMessage;
+import com.codebrig.beam.crypt.messages.RSABeamMessage;
+import com.codebrig.beam.messages.BeamMessage;
 import java.io.IOException;
 
 /**

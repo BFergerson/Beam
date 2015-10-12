@@ -28,8 +28,11 @@
 package com.jcraft.jhttptunnel;
 
 import com.codebrig.beam.utils.ByteArrayQueue;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.SocketException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class InBoundURL extends InBound
 {

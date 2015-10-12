@@ -29,17 +29,17 @@
  */
 package com.codebrig.beam;
 
-import com.codebrig.beam.messages.SystemMessageType;
-import com.codebrig.beam.handlers.BeamHandler;
-import com.codebrig.beam.messages.BeamMessage;
-import com.codebrig.beam.messages.SystemMessage;
 import com.codebrig.beam.connection.raw.RawDataChannel;
 import com.codebrig.beam.crypt.EncryptedBeamMessage;
+import com.codebrig.beam.handlers.BeamHandler;
 import com.codebrig.beam.handlers.SystemHandler;
+import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.BeamMessageType;
-import com.codebrig.beam.system.handlers.ping.ClientPingPongHandler;
+import com.codebrig.beam.messages.SystemMessage;
+import com.codebrig.beam.messages.SystemMessageType;
 import com.codebrig.beam.system.handlers.HandshakeHandler;
 import com.codebrig.beam.system.handlers.TestConnectionHandler;
+import com.codebrig.beam.system.handlers.ping.ClientPingPongHandler;
 import com.codebrig.beam.system.messages.HandshakeMessage;
 import com.codebrig.beam.transfer.FileTransferChannel;
 import com.codebrig.beam.utils.Generator;

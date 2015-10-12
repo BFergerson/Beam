@@ -30,7 +30,6 @@
 package com.google.protobuf;
 
 import com.google.protobuf.LazyField.LazyIterator;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;

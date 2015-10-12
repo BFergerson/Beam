@@ -29,11 +29,11 @@
  */
 package com.codebrig.beam.system.handlers.ping;
 
-import com.codebrig.beam.messages.BeamMessage;
-import com.codebrig.beam.messages.SystemMessageType;
 import com.codebrig.beam.SystemCommunicator;
 import com.codebrig.beam.handlers.SystemHandler;
+import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.SystemMessage;
+import com.codebrig.beam.messages.SystemMessageType;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>

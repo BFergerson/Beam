@@ -29,13 +29,13 @@
  */
 package com.codebrig.beam.connection.traversal.punch.udp.server.handlers;
 
-import com.codebrig.beam.handlers.BeamHandler;
-import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.connection.traversal.punch.udp.messages.UDPPunchMessage;
 import com.codebrig.beam.connection.traversal.punch.udp.messages.UDPPunchMessageType;
 import com.codebrig.beam.connection.traversal.punch.udp.server.NATDevice;
 import com.codebrig.beam.connection.traversal.punch.udp.server.UDPPunchServer;
+import com.codebrig.beam.handlers.BeamHandler;
+import com.codebrig.beam.messages.BeamMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>

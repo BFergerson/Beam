@@ -27,7 +27,7 @@
  */
 package com.jcraft.jhttptunnel;
 
-import java.io.*;
+import java.io.IOException;
 
 public abstract class InBound extends Bound
 {

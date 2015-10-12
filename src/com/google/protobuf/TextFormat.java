@@ -33,7 +33,6 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.CharBuffer;

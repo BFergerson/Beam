@@ -29,11 +29,11 @@
  */
 package com.codebrig.beam.crypt.handlers;
 
+import com.codebrig.beam.Communicator;
+import com.codebrig.beam.crypt.AES;
 import com.codebrig.beam.handlers.BeamHandler;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.SystemMessage;
-import com.codebrig.beam.Communicator;
-import com.codebrig.beam.crypt.AES;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>

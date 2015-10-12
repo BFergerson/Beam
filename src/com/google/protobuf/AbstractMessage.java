@@ -32,7 +32,6 @@ package com.google.protobuf;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.OneofDescriptor;
 import com.google.protobuf.Internal.EnumLite;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;

@@ -27,8 +27,11 @@
  */
 package com.jcraft.jhttptunnel;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
 
 class HTTPSocket
 {

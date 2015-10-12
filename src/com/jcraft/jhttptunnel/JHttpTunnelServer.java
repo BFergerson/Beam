@@ -28,8 +28,10 @@
 package com.jcraft.jhttptunnel;
 
 import com.codebrig.beam.connection.httptunnel.TunnelPorts;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class JHttpTunnelServer extends Thread
 {

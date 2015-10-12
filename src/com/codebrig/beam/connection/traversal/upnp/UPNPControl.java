@@ -35,9 +35,9 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import net.sbbi.upnp.Discovery;
 import net.sbbi.upnp.impls.InternetGatewayDevice;
 import net.sbbi.upnp.messages.UPNPResponseException;
-import net.sbbi.upnp.Discovery;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>

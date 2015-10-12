@@ -29,13 +29,13 @@
  */
 package com.codebrig.beam;
 
-import com.codebrig.beam.pool.DefaultCommunicatorPool;
-import com.codebrig.beam.pool.CommunicatorPool;
-import com.codebrig.beam.handlers.BeamHandler;
-import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.connection.ConnectionType;
 import com.codebrig.beam.crypt.handlers.RSAHandshakeHandler;
+import com.codebrig.beam.handlers.BeamHandler;
+import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.BeamMessageType;
+import com.codebrig.beam.pool.CommunicatorPool;
+import com.codebrig.beam.pool.DefaultCommunicatorPool;
 import com.codebrig.beam.system.handlers.ping.ServerPingPongHandler;
 import java.io.IOException;
 import java.net.BindException;

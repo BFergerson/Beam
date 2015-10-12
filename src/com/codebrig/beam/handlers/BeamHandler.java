@@ -30,8 +30,8 @@
 package com.codebrig.beam.handlers;
 
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.messages.InvalidBeamMessage;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.InvalidBeamMessage;
 import java.util.Arrays;
 
 /**

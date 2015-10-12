@@ -34,7 +34,6 @@ import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.Descriptors.OneofDescriptor;
-
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;

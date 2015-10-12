@@ -29,7 +29,9 @@ package com.jcraft.jhttptunnel;
 
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.utils.Generator;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 public class JHttpTunnelClient

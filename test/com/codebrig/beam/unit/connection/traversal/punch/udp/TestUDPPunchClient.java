@@ -29,11 +29,13 @@
  */
 package com.codebrig.beam.unit.connection.traversal.punch.udp;
 
-import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.Communicator;
-import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.*;
 import com.codebrig.beam.connection.traversal.punch.udp.client.UDPPunchClient;
 import com.codebrig.beam.messages.BasicMessage;
+import com.codebrig.beam.messages.BeamMessage;
+import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_MESSAGE_TYPE;
+import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_PEER_ACCESS_CODE;
+import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_PEER_IDENTIFIER;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>

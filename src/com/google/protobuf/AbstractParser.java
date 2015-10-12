@@ -30,7 +30,6 @@
 package com.google.protobuf;
 
 import com.google.protobuf.AbstractMessageLite.Builder.LimitedInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 

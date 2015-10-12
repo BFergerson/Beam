@@ -29,7 +29,6 @@
  */
 package com.codebrig.beam;
 
-import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.connection.ConnectionType;
 import com.codebrig.beam.crypt.AES;
 import com.codebrig.beam.crypt.RSA;
@@ -37,6 +36,7 @@ import com.codebrig.beam.crypt.RSAConnection;
 import com.codebrig.beam.crypt.RSAConnectionHolder;
 import com.codebrig.beam.crypt.messages.RSAHandshakeMessage;
 import com.codebrig.beam.handlers.BeamHandler;
+import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.BeamMessageType;
 import com.codebrig.beam.utils.Base64;
 import com.codebrig.beam.utils.Generator;

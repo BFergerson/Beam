@@ -29,10 +29,10 @@
  */
 package com.codebrig.beam.transfer;
 
-import com.codebrig.beam.utils.CRC64;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.SystemMessage;
 import com.codebrig.beam.messages.SystemMessageType;
+import com.codebrig.beam.utils.CRC64;
 import java.util.Arrays;
 
 /**

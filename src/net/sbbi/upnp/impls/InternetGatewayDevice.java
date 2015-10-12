@@ -43,15 +43,9 @@
 package net.sbbi.upnp.impls;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;

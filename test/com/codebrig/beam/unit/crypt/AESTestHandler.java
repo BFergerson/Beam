@@ -29,10 +29,10 @@
  */
 package com.codebrig.beam.unit.crypt;
 
-import com.codebrig.beam.crypt.handlers.AESBeamHandler;
-import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.Communicator;
+import com.codebrig.beam.crypt.handlers.AESBeamHandler;
 import com.codebrig.beam.messages.BasicMessage;
+import com.codebrig.beam.messages.BeamMessage;
 
 public class AESTestHandler extends AESBeamHandler
 {
