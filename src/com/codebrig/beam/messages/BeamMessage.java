@@ -623,8 +623,7 @@ public class BeamMessage<T extends BeamMessage>
     }
 
     public T emptySuccessResponse () {
-        T msg = successResponse ();
-        return (T) msg.clear ();
+        return (T) clear ().successResponse ();
     }
 
     public T errorResponse () {
@@ -633,8 +632,7 @@ public class BeamMessage<T extends BeamMessage>
     }
 
     public T emptyErrorResponse () {
-        T msg = errorResponse ();
-        return (T) msg.clear ();
+        return (T) clear ().errorResponse ();
     }
 
     private String[] toStringArray (Object... value) {
