@@ -148,7 +148,7 @@ public class ActionMessage
         conn.setUseCaches (false);
         conn.setRequestMethod ("POST");
         conn.setInstanceFollowRedirects (false);
-        // conn.setConnectTimeout( 30000 );
+        conn.setConnectTimeout( 30000 );
         conn.setRequestProperty ("HOST", url.getHost () + ":" + url.getPort ());
         conn.setRequestProperty ("CONTENT-TYPE", "text/xml; charset=\"utf-8\"");
         conn.setRequestProperty ("CONTENT-LENGTH", Integer.toString (body.length ()));
