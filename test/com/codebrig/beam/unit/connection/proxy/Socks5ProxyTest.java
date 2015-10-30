@@ -42,7 +42,6 @@ import java.net.Proxy;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import socks.SocksException;
 
 /**
  * todo: convert to using Beam client (no handshake) and get raw streams
@@ -54,7 +53,7 @@ public class Socks5ProxyTest
 
     private static final int PROXY_TIMEOUT_INTERVAL = 10 * 1000; //10 seconds
 
-    public static void main (String[] args) throws UnknownHostException, SocksException, IOException {
+    public static void main (String[] args) throws UnknownHostException, IOException {
         //non-proxy connect
         System.out.println ("Connecting without proxy...\n");
         Socket sock = new Socket ();
