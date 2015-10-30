@@ -49,7 +49,8 @@ import java.util.Objects;
 public class BeamMessage<T extends BeamMessage>
 {
 
-    public static final int HEADER_SIZE = 20;
+    public static final int HEADER_SIZE = 20; //20 bytes
+    public static final int MAX_MESSAGE_SIZE = 52428800; //50 MB
 
     protected boolean systemMessage;
     protected int type;

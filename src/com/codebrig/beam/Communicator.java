@@ -81,7 +81,6 @@ public class Communicator implements Runnable
     public static final int UNDEFINED_WAIT = -2;
     public static final int WAIT_FOREVER = -1;
     public static final int DEFAULT_MESSAGE_WAIT_TIME = 7500; //7.5 seconds
-    private static final long MAX_MESSAGE_SIZE_BYTES = 52428800L; //50 MB
 
     private static int GLOBAL_DEFAULT_WAIT_TIME = DEFAULT_MESSAGE_WAIT_TIME;
     private int individualWaitTime = UNDEFINED_WAIT;
@@ -462,7 +461,7 @@ public class Communicator implements Runnable
             final long id = headerBuf.getLong (); //message id
             final boolean rawData = headerBuf.get () == 1;
 
-            if (size > MAX_MESSAGE_SIZE_BYTES || size < 0) {
+            if (size > BeamMessage.MAX_MESSAGE_SIZE || size < 0) {
                 //message too big or invalid; other end isn't playing nice. drop connection
                 close ();
                 return null;
