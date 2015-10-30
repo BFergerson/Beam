@@ -43,6 +43,7 @@ import com.codebrig.beam.utils.Generator;
 import com.jcraft.jhttptunnel.JHttpTunnelClient;
 import java.io.IOException;
 import java.net.Authenticator;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
@@ -90,6 +91,26 @@ public class BeamClient
 
     public BeamClient (String host, int port) {
         this (host, null, port, true);
+    }
+
+    public BeamClient (InetAddress ip, int port) {
+        this (ip.getHostName (), null, port, true);
+    }
+
+    public BeamClient (InetAddress ip, int port, Proxy proxy, String proxyUsername, String proxyPassword) {
+        this (ip.getHostName (), null, port, true);
+
+        this.proxy = proxy;
+        this.proxyUsername = proxyUsername;
+        this.proxyPassword = proxyPassword;
+    }
+
+    public BeamClient (InetAddress ip, int port, Proxy proxy, String proxyUsername, String proxyPassword, boolean useSSLSocket) {
+        this (ip.getHostName (), null, port, useSSLSocket);
+
+        this.proxy = proxy;
+        this.proxyUsername = proxyUsername;
+        this.proxyPassword = proxyPassword;
     }
 
     public BeamClient (String host, String clientName, int port) {
