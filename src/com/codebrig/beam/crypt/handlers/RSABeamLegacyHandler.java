@@ -30,38 +30,60 @@
 package com.codebrig.beam.crypt.handlers;
 
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.crypt.AES;
-import com.codebrig.beam.handlers.BeamHandler;
+import com.codebrig.beam.crypt.CryptException;
+import com.codebrig.beam.crypt.RSAConnection;
+import com.codebrig.beam.crypt.RSAConnectionHolder;
+import com.codebrig.beam.crypt.messages.RSABeamMessage;
+import com.codebrig.beam.handlers.LegacyHandler;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import com.codebrig.beam.messages.SystemMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public abstract class AESBeamHandler extends BeamHandler
+public abstract class RSABeamLegacyHandler extends LegacyHandler
 {
 
-    private final AES aes;
-
-    public AESBeamHandler (AES aes, int... types) {
+    public RSABeamLegacyHandler (int... types) {
         super (types);
-
-        this.aes = aes;
     }
 
     @Override
     public BeamMessage processIncomingMessage (Communicator comm, BeamMessage message) {
-        byte[] decryptedData = aes.decrypt (message.getData ());
-        return new SystemMessage (message.isRawData (), message.getType (),
-                decryptedData, message.isSystemMessage ()).toBeamMessage ();
+        LegacyMessage basicMessage = new LegacyMessage (message);
+        String session = basicMessage.getString ("beam_rsas");
+        byte[] messageData = basicMessage.getBytes ("beam_rsamd");
+        String rawData = basicMessage.getString ("beam_rsa_raw");
+        if (session == null || messageData == null || rawData == null) {
+            throw new CryptException ("Invalid RSA connection!");
+        }
+
+        RSAConnection conn = RSAConnectionHolder.getRSAConnection (comm.getUID (), session);
+        if (conn == null) {
+            throw new CryptException ("Invalid RSA connection!");
+        }
+
+        byte[] decryptedData = conn.getAES ().decrypt (messageData);
+        return new SystemMessage ("true".equals (rawData), message.getType (),
+                decryptedData, message.isSystemMessage ());
     }
 
     @Override
     public BeamMessage processOutgoingMessage (Communicator comm,
             BeamMessage originalMessage, BeamMessage responseMessage) {
-        byte[] encryptedData = aes.encrypt (responseMessage.getData ());
-        return new SystemMessage (true, responseMessage.getType (),
-                encryptedData, responseMessage.isSystemMessage ());
+        LegacyMessage basicMessage = new LegacyMessage (originalMessage);
+        String session = basicMessage.getString ("beam_rsas");
+        if (session == null) {
+            throw new CryptException ("Invalid RSA connection!");
+        }
+
+        RSAConnection conn = RSAConnectionHolder.getRSAConnection (comm.getUID (), session);
+        if (conn == null) {
+            throw new CryptException ("Invalid RSA connection!");
+        }
+
+        return new RSABeamMessage (conn, new LegacyMessage (responseMessage));
     }
 
 }

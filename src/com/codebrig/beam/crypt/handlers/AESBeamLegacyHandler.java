@@ -31,19 +31,19 @@ package com.codebrig.beam.crypt.handlers;
 
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.crypt.AES;
-import com.codebrig.beam.handlers.BeamHandler;
+import com.codebrig.beam.handlers.LegacyHandler;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.SystemMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public abstract class AESBeamHandler extends BeamHandler
+public abstract class AESBeamLegacyHandler extends LegacyHandler
 {
 
     private final AES aes;
 
-    public AESBeamHandler (AES aes, int... types) {
+    public AESBeamLegacyHandler (AES aes, int... types) {
         super (types);
 
         this.aes = aes;

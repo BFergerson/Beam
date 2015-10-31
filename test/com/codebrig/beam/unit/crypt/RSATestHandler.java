@@ -30,14 +30,13 @@
 package com.codebrig.beam.unit.crypt;
 
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.crypt.handlers.RSABeamHandler;
-import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.crypt.handlers.RSABeamLegacyHandler;
 import com.codebrig.beam.messages.LegacyMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class RSATestHandler extends RSABeamHandler
+public class RSATestHandler extends RSABeamLegacyHandler
 {
 
     public RSATestHandler () {
@@ -45,7 +44,7 @@ public class RSATestHandler extends RSABeamHandler
     }
 
     @Override
-    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
+    public LegacyMessage messageReceived (Communicator comm, LegacyMessage message) {
         assert (message.get ("rsa_test_variable").equals ("rsa_test_value"));
         System.out.println ("RSA sent message valid!");
 

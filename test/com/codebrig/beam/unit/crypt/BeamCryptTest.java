@@ -39,6 +39,7 @@ import com.codebrig.beam.crypt.handlers.RSAHandshakeHandler;
 import com.codebrig.beam.crypt.messages.AESBeamMessage;
 import com.codebrig.beam.crypt.messages.RSABeamMessage;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import java.io.IOException;
 
 /**
@@ -97,14 +98,14 @@ public class BeamCryptTest
     }
 
     private static void checkAES () {
-        BeamMessage sendMessage = new AESBeamMessage (
-                aes, AES_CRYPT_TEST_MESSAGE);
+        LegacyMessage sendMessage = new LegacyMessage (new AESBeamMessage (
+                aes, AES_CRYPT_TEST_MESSAGE));
 
         //set message data
         sendMessage.set ("aes_test_variable", "aes_test_value");
 
         //send and recieve response
-        BeamMessage responseMessage = client.getCommunicator ().send (sendMessage);
+        LegacyMessage responseMessage = new LegacyMessage (client.getCommunicator ().send (sendMessage));
 
         //check response data
         assert (responseMessage.get ("aes_response_variable").equals ("aes_response_value"));
@@ -114,14 +115,14 @@ public class BeamCryptTest
     private static void checkRSA () {
         RSAConnection rsaConn = client.establishRSAConnection (serverRSA);
 
-        BeamMessage sendMessage = new RSABeamMessage (
-                rsaConn, RSA_CRYPT_TEST_MESSAGE);
+        LegacyMessage sendMessage = new LegacyMessage (new RSABeamMessage (
+                rsaConn, RSA_CRYPT_TEST_MESSAGE));
 
         //set message data
         sendMessage.set ("rsa_test_variable", "rsa_test_value");
 
         //send and recieve response
-        BeamMessage responseMessage = client.getCommunicator ().send (sendMessage);
+        LegacyMessage responseMessage = new LegacyMessage (client.getCommunicator ().send (sendMessage));
 
         //check response data
         assert (responseMessage.get ("rsa_response_variable").equals ("rsa_response_value"));

@@ -40,7 +40,7 @@ import com.codebrig.beam.messages.LegacyMessage;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class RSABeamMessage extends LegacyMessage implements EncryptedBeamMessage
+public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
 {
 
     private final RSAConnection rsaConnection;
