@@ -39,6 +39,9 @@ public class ExampleChatMessage extends BeamMessage<ExampleChatMessage>
 
     public static final int CHAT_MESSAGE_ID = 1000;
 
+    private String username;
+    private String message;
+
     public ExampleChatMessage () {
         super (CHAT_MESSAGE_ID);
     }
@@ -48,19 +51,21 @@ public class ExampleChatMessage extends BeamMessage<ExampleChatMessage>
     }
 
     public ExampleChatMessage setUsername (String username) {
-        return setString ("username", username);
+        this.username = username;
+        return this;
     }
 
     public String getUsername () {
-        return getString ("username");
+        return username;
     }
 
     public ExampleChatMessage setMessage (String message) {
-        return setString ("message", message);
+        this.message = message;
+        return this;
     }
 
     public String getMessage () {
-        return getString ("message");
+        return message;
     }
 
 }

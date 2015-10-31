@@ -32,9 +32,9 @@ package com.codebrig.beam.unit.transfer;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.handlers.BasicHandler;
-import com.codebrig.beam.messages.BasicMessage;
+import com.codebrig.beam.handlers.LegacyHandler;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import com.codebrig.beam.transfer.FileTransferChannel;
 import java.io.File;
 import java.io.IOException;
@@ -61,10 +61,10 @@ public class TestFileTransfer
         BeamClient client = startClient ();
 
         FileTransferChannel fileChannel = client.getCommunicator ().createFileTransferChannel ();
-        BasicMessage message = new BasicMessage (TEST_MESSAGE)
+        LegacyMessage message = new LegacyMessage (TEST_MESSAGE)
                 .setLong ("channel_id", fileChannel.getTransferChannelId ());
         BeamMessage responseMessage = client.getCommunicator ().send (message);
-        message = new BasicMessage (responseMessage);
+        message = new LegacyMessage (responseMessage);
 
         fileChannel.connect (message.getLong ("channel_id"));
         fileChannel.sendFile (new File ("C:\\temp\\send_file.txt"));
@@ -87,11 +87,11 @@ public class TestFileTransfer
         server.start ();
 
         //add handler to accept client's test message
-        server.addGlobalHandler (new BasicHandler (TEST_MESSAGE)
+        server.addGlobalHandler (new LegacyHandler (TEST_MESSAGE)
         {
 
             @Override
-            public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
+            public LegacyMessage messageReceived (Communicator comm, LegacyMessage message) {
                 //user wants to transfer a file. establish file transfer channel
                 FileTransferChannel fileChannel = comm.createFileTransferChannel ();
                 fileChannel.connect (message.getLong ("channel_id"));

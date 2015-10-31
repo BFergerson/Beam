@@ -39,34 +39,34 @@ import com.codebrig.beam.messages.SystemMessageType;
 public class FileTransferMessage extends SystemMessage<FileTransferMessage>
 {
 
-    public FileTransferMessage (long rawChannelId) {
+    private long transferChannelId;
+    private boolean finished;
+
+    public FileTransferMessage (long transferChannelId) {
         super (SystemMessageType.FILE_TRANSFER_CONNECTION);
 
-        setLong ("transfer_channel_id", rawChannelId);
+        this.transferChannelId = transferChannelId;
     }
 
     public FileTransferMessage (BeamMessage message) {
         super (message);
     }
 
-    public FileTransferMessage setRawChannelId (long rawChannelId) {
-        return setLong ("transfer_channel_id", rawChannelId);
+    public FileTransferMessage setTransferChannelId (long transferChannelId) {
+        this.transferChannelId = transferChannelId;
+        return this;
     }
 
-    public Long getRawChannelId () {
-        return getLong ("transfer_channel_id");
+    public long getTransferChannelId () {
+        return transferChannelId;
     }
 
     public FileTransferMessage setFinished (boolean finished) {
-        return setBoolean ("finished", finished);
+        this.finished = finished;
+        return this;
     }
 
     public boolean isFinished () {
-        Boolean finished = getBoolean ("finished");
-        if (finished == null) {
-            return false;
-        }
-
         return finished;
     }
 

@@ -30,7 +30,7 @@
 package com.codebrig.beam.pool;
 
 import com.codebrig.beam.BeamClient;
-import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,7 +77,7 @@ public class DefaultClientPool<ClientT extends BeamClient> implements ClientPool
     }
 
     @Override
-    public boolean sendDirectMessage (long clientUID, BeamMessage message) {
+    public boolean sendDirectMessage (long clientUID, LegacyMessage message) {
         ClientT comm = clients.get (clientUID);
         if (comm != null && comm.getCommunicator ().isRunning ()) {
             comm.getCommunicator ().queue (message);
@@ -88,7 +88,7 @@ public class DefaultClientPool<ClientT extends BeamClient> implements ClientPool
     }
 
     @Override
-    public int broadcastMessage (BeamMessage message) {
+    public int broadcastMessage (LegacyMessage message) {
         final Iterator<ClientT> itr = clients.values ().iterator ();
         final ArrayList<Long> purgeList = new ArrayList<> ();
         int sendCount = 0;

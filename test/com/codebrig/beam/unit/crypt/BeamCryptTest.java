@@ -48,11 +48,9 @@ public class BeamCryptTest
 {
 
     public final static AES aes = new AES ("password");
-
     public final static RSA serverRSA = new RSA (1024);
 
     public final static int CRYPT_TEST_PORT = 4444;
-
     public final static int AES_CRYPT_TEST_MESSAGE = 1;
     public final static int RSA_CRYPT_TEST_MESSAGE = 2;
 

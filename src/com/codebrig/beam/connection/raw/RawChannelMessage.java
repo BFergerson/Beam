@@ -39,10 +39,12 @@ import com.codebrig.beam.messages.SystemMessageType;
 public class RawChannelMessage extends SystemMessage
 {
 
+    private long rawChannelId;
+
     public RawChannelMessage (long rawChannelId) {
         super (SystemMessageType.RAW_DATA_CONNECTION);
 
-        setLong ("raw_channel_id", rawChannelId);
+        this.rawChannelId = rawChannelId;
     }
 
     public RawChannelMessage (BeamMessage message) {
@@ -50,12 +52,12 @@ public class RawChannelMessage extends SystemMessage
     }
 
     public RawChannelMessage setRawChannelId (long rawChannelId) {
-        setLong ("raw_channel_id", rawChannelId);
+        this.rawChannelId = rawChannelId;
         return this;
     }
 
-    public Long getRawChannelId () {
-        return getLong ("raw_channel_id");
+    public long getRawChannelId () {
+        return rawChannelId;
     }
 
 }

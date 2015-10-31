@@ -36,31 +36,35 @@ import com.codebrig.beam.messages.SystemMessageType;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class HandshakeMessage extends SystemMessage
+public class HandshakeMessage extends SystemMessage<HandshakeMessage>
 {
 
-    public HandshakeMessage (String clientVersion, long currentTime, boolean clientTunneled) {
+    private String version;
+    private long localTime;
+    private boolean tunnelConnection;
+
+    public HandshakeMessage (String version, long localTime, boolean tunnelConnection) {
         super (SystemMessageType.BEAM_HANDSHAKE);
 
-        setString ("version", clientVersion);
-        setLong ("local_time", currentTime);
-        setBoolean ("tunnel_connection", clientTunneled);
+        this.version = version;
+        this.localTime = localTime;
+        this.tunnelConnection = tunnelConnection;
     }
 
     public HandshakeMessage (BeamMessage beamMessage) {
-        super (beamMessage, false, true);
+        super (beamMessage);
     }
 
     public String getVersion () {
-        return getString ("version");
+        return version;
     }
 
     public long getLocalTime () {
-        return getLong ("local_time");
+        return localTime;
     }
 
     public boolean isTunnelConnection () {
-        return getBoolean ("tunnel_connection");
+        return tunnelConnection;
     }
 
 }

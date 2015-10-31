@@ -30,6 +30,7 @@
 package com.codebrig.beam.transfer;
 
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import com.codebrig.beam.messages.SystemMessage;
 import com.codebrig.beam.messages.SystemMessageType;
 import java.util.ArrayList;
@@ -40,6 +41,14 @@ import java.util.List;
  */
 public class FileBurstMessage extends SystemMessage<FileBurstMessage>
 {
+
+    private int blockCount;
+    private int burstSize;
+    private int blockSize;
+    private int lastBlockSize;
+    private boolean burstConfirmation;
+    private List<Integer> confirmedBlocks;
+    private boolean burstComplete;
 
     public FileBurstMessage (long transferChannelId) {
         super (SystemMessageType.FILE_BURST);
@@ -52,74 +61,66 @@ public class FileBurstMessage extends SystemMessage<FileBurstMessage>
     }
 
     public FileBurstMessage setBlockCount (int blockCount) {
-        return setInt ("block_count", blockCount);
+        this.blockCount = blockCount;
+        return this;
     }
 
     public int getBlockCount () {
-        return getInt ("block_count");
+        return blockCount;
     }
 
     public FileBurstMessage setBurstSize (int burstSize) {
-        return setInt ("burst_size", burstSize);
+        this.burstSize = burstSize;
+        return this;
     }
 
     public int getBurstSize () {
-        return getInt ("burst_size");
+        return burstSize;
     }
 
     public FileBurstMessage setBlockSize (int blockSize) {
-        return setInt ("block_size", blockSize);
+        this.blockSize = blockSize;
+        return this;
     }
 
     public int getBlockSize () {
-        return getInt ("block_size");
+        return blockSize;
     }
 
     public FileBurstMessage setLastBlockSize (int lastBlockSize) {
-        return setInt ("last_block_size", lastBlockSize);
+        this.lastBlockSize = lastBlockSize;
+        return this;
     }
 
     public int getLastBlockSize () {
-        return getInt ("last_block_size");
+        return lastBlockSize;
     }
 
     public FileBurstMessage setBurstConfirmationMessage (boolean burstConfirmation) {
-        return setBoolean ("burst_confirmation", burstConfirmation);
+        this.burstConfirmation = burstConfirmation;
+        return this;
     }
 
     public boolean isBurstConfirmationMessage () {
-        Object burstOb = getBoolean ("burst_confirmation");
-        if (burstOb == null) {
-            return false;
-        }
-
-        return (Boolean) burstOb;
+        return burstConfirmation;
     }
 
     public FileBurstMessage setConfirmedBlockList (List<Integer> confirmedBlocks) {
-        return setInt ("confirmed_blocks", confirmedBlocks.toArray (new Integer[confirmedBlocks.size ()]));
+        this.confirmedBlocks = new ArrayList<> (confirmedBlocks);
+        return this;
     }
 
     public List<Integer> getConfirmedBlockList () {
-        List<Integer> confirmedBlocksList = getInts ("confirmed_blocks");
-        if (confirmedBlocksList == null) {
-            return new ArrayList<> ();
-        }
-
-        return confirmedBlocksList;
+        return confirmedBlocks;
     }
 
     public FileBurstMessage setBurstComplete (boolean burstComplete) {
-        return setBoolean ("burst_complete", burstComplete);
+        this.burstComplete = burstComplete;
+        return this;
     }
 
     public boolean isBurstComplete () {
-        Object burstOb = getBoolean ("burst_complete");
-        if (burstOb == null) {
-            return false;
-        }
-
-        return (Boolean) burstOb;
+        return burstComplete;
     }
 
 }

@@ -32,9 +32,9 @@ package com.codebrig.beam.unit;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.handlers.BasicHandler;
-import com.codebrig.beam.messages.BasicMessage;
+import com.codebrig.beam.handlers.LegacyHandler;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import java.io.IOException;
 
 /**
@@ -84,11 +84,11 @@ public class TestClientServer
         server.start ();
 
         //add handler to accept client's test message
-        server.addGlobalHandler (new BasicHandler (TEST_MESSAGE)
+        server.addGlobalHandler (new LegacyHandler (TEST_MESSAGE)
         {
 
             @Override
-            public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
+            public LegacyMessage messageReceived (Communicator comm, LegacyMessage message) {
                 System.out.println ("Received message from client: " + message.getString ("client_message"));
 
                 //clear and add response
@@ -101,16 +101,16 @@ public class TestClientServer
     }
 
     private static void sendMessageToServer (BeamClient client) {
-        BasicMessage message = new BasicMessage (TEST_MESSAGE);
+        LegacyMessage message = new LegacyMessage (TEST_MESSAGE);
         message.setString ("client_message", "Hello from client!");
         
         BeamMessage responseMessage = client.getCommunicator ().send (message);
-        BasicMessage responseBasicMessage = new BasicMessage (responseMessage);
+        LegacyMessage responseBasicMessage = new LegacyMessage (responseMessage);
         System.out.println ("Received message from server: " + responseBasicMessage.getString ("server_response"));
     }
 
     private static void broadcastMessage () {
-        BasicMessage message = new BasicMessage (TEST_MESSAGE);
+        LegacyMessage message = new LegacyMessage (TEST_MESSAGE);
         message.setString ("broadcast_message", "Hello everyone from server!");
 
         server.broadcast (message);

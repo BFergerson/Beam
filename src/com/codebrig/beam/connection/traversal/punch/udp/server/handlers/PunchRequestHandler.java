@@ -58,23 +58,23 @@ public class PunchRequestHandler extends BeamHandler
 
         NATDevice natDevice = punchServer.getNATDeviceHolder ().getNATDevice (peerIdentifier, accessCode);
         if (natDevice == null) {
-            punchMessage.clear ();
+            //punchMessage.clear (); todo: clear alternative
             return punchMessage.setSuccessful (false);
         }
 
         //alert user who created hole of punch
         Communicator holeComm = natDevice.getCommunicator ();
-        punchMessage.setIPAddress (comm.getHostIPAddress ());
+        punchMessage.setIpAddress (comm.getHostIPAddress ());
         punchMessage.setListenPort (listenPort);
         punchMessage.setSuccessful (true);
         holeComm.queue (punchMessage);
 
         //let puncher know who to connect to
-        punchMessage.clear ();
-        punchMessage.setIPAddress (holeComm.getHostIPAddress ());
+        //punchMessage.clear (); todo: clear alternative
+        punchMessage.setIpAddress (holeComm.getHostIPAddress ());
         punchMessage.setListenPort (natDevice.getConnectionPort (accessCode));
         System.out.println (String.format ("Peer punched hole - IP: %s Port: %s to Peer: %s Access: %s IP:%s Port: %s",
-                comm.getHostIPAddress (), listenPort, peerIdentifier, accessCode, punchMessage.getIPAddress (), punchMessage.getListenPort ()));
+                comm.getHostIPAddress (), listenPort, peerIdentifier, accessCode, punchMessage.getIpAddress (), punchMessage.getListenPort ()));
         return punchMessage.setSuccessful (true);
     }
 

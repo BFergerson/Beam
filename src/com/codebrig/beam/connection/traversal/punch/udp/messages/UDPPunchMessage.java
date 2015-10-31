@@ -37,12 +37,18 @@ import com.codebrig.beam.messages.BeamMessage;
 public class UDPPunchMessage extends BeamMessage
 {
 
+    private String peerIdentifier;
+    private String accessCode;
+    private String requestPeerIdentifier;
+    private String ipAddress;
+    private int listenPort;
+
     public UDPPunchMessage (int messageType, String peerIdentifier, String accessCode, int listenPort) {
         super (messageType);
 
-        setString ("peer_identifier", peerIdentifier);
-        setString ("access_code", accessCode);
-        setInt ("listen_port", listenPort);
+        this.peerIdentifier = peerIdentifier;
+        this.accessCode = accessCode;
+        this.listenPort = listenPort;
     }
 
     public UDPPunchMessage (BeamMessage message) {
@@ -50,38 +56,38 @@ public class UDPPunchMessage extends BeamMessage
     }
 
     public String getPeerIdentifier () {
-        return getString ("peer_identifier");
+        return peerIdentifier;
     }
 
     public UDPPunchMessage setRequestPeerIdentifier (String requestPeerIdentifier) {
-        setString ("request_peer_identifier", requestPeerIdentifier);
+        this.requestPeerIdentifier = requestPeerIdentifier;
         return this;
     }
 
     public String getRequestPeerIdentifier () {
-        return getString ("request_peer_identifier");
+        return requestPeerIdentifier;
     }
 
     public String getAccessCode () {
-        return getString ("access_code");
+        return accessCode;
     }
 
-    public UDPPunchMessage setIPAddress (String ipAddress) {
-        setString ("ip_address", ipAddress);
+    public UDPPunchMessage setIpAddress (String ipAddress) {
+        this.ipAddress = ipAddress;
         return this;
     }
 
-    public String getIPAddress () {
-        return getString ("ip_address");
+    public String getIpAddress () {
+        return ipAddress;
     }
 
     public UDPPunchMessage setListenPort (int listenPort) {
-        setInt ("listen_port", listenPort);
+        this.listenPort = listenPort;
         return this;
     }
 
     public int getListenPort () {
-        return getInt ("listen_port");
+        return listenPort;
     }
 
 }

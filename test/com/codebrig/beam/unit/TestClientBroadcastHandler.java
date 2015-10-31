@@ -30,14 +30,13 @@
 package com.codebrig.beam.unit;
 
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.handlers.BasicHandler;
-import com.codebrig.beam.messages.BasicMessage;
-import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.handlers.LegacyHandler;
+import com.codebrig.beam.messages.LegacyMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class TestClientBroadcastHandler extends BasicHandler
+public class TestClientBroadcastHandler extends LegacyHandler
 {
 
     public TestClientBroadcastHandler () {
@@ -45,7 +44,7 @@ public class TestClientBroadcastHandler extends BasicHandler
     }
 
     @Override
-    public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
+    public LegacyMessage messageReceived (Communicator comm, LegacyMessage message) {
         System.out.println (String.format ("%s received broadcast message: %s",
                 comm.getName (), message.getString ("broadcast_message")));
 

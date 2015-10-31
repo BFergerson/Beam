@@ -34,13 +34,13 @@ import com.codebrig.beam.crypt.CryptException;
 import com.codebrig.beam.crypt.EncryptedBeamMessage;
 import com.codebrig.beam.crypt.RSA;
 import com.codebrig.beam.crypt.RSAConnection;
-import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
+public class RSABeamMessage extends LegacyMessage implements EncryptedBeamMessage
 {
 
     private final RSAConnection rsaConnection;
@@ -56,8 +56,8 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
         this.rsaConnection = rsaConnection;
     }
 
-    public RSABeamMessage (RSAConnection rsaConnection, BeamMessage message) {
-        super (message, false, false);
+    public RSABeamMessage (RSAConnection rsaConnection, LegacyMessage message) {
+        super (message);
 
         if (rsaConnection == null) {
             throw new IllegalArgumentException ("Null rsa connection!");
@@ -72,7 +72,7 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
 
     @Override
     public byte[] getData () {
-        BasicMessage message = new BasicMessage (getType ());
+        LegacyMessage message = new LegacyMessage (getType ());
         AES aes = rsaConnection.getAES ();
         RSA publicRSA = rsaConnection.getPublicRSA ();
         byte[] messageData;
@@ -96,7 +96,7 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
 
     public BeamMessage decryptBeamMessage (BeamMessage message) {
         try {
-            BasicMessage basicMessage = new BasicMessage (message);
+            LegacyMessage basicMessage = new LegacyMessage (message);
             AES aes = rsaConnection.getAES ();
             RSA publicRSA = rsaConnection.getPublicRSA ();
             byte[] messageData = basicMessage.getBytes ("beam_rsamd");
@@ -105,11 +105,11 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
             if (aes == null || rsaConnection.getSession () == null) {
                 byte[] data = publicRSA.decrypt (messageData);
 
-                BeamMessage decryptedMessage = new BeamMessage (message.getType (), data, "false".equals (rsaRaw));
+                LegacyMessage decryptedMessage = new LegacyMessage (message.getType (), data, "false".equals (rsaRaw));
                 return decryptedMessage;
             } else {
                 byte[] data = aes.decrypt (messageData);
-                return new BeamMessage (message.getType (), data, "false".equals (rsaRaw));
+                return new LegacyMessage (message.getType (), data, "false".equals (rsaRaw));
             }
         } catch (Exception ex) {
             throw new CryptException (ex);

@@ -36,14 +36,14 @@ import static com.codebrig.beam.connection.traversal.punch.udp.messages.UDPPunch
 import com.codebrig.beam.connection.traversal.punch.udp.server.NATDevice;
 import com.codebrig.beam.connection.traversal.punch.udp.server.NATDeviceHolder;
 import com.codebrig.beam.connection.traversal.punch.udp.server.UDPPunchServer;
-import com.codebrig.beam.handlers.BeamHandler;
-import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.handlers.LegacyHandler;
+import com.codebrig.beam.messages.LegacyMessage;
 
 /**
  *
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class ConnectionHandler extends BeamHandler
+public class ConnectionHandler extends LegacyHandler
 {
 
     private UDPPunchServer punchServer;
@@ -53,7 +53,7 @@ public class ConnectionHandler extends BeamHandler
     }
 
     @Override
-    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
+    public LegacyMessage messageReceived (Communicator comm, LegacyMessage message) {
         UDPPunchMessage msg = new UDPPunchMessage (message);
         String peerIdentifier = msg.getPeerIdentifier ();
         String accessCode = msg.getAccessCode ();

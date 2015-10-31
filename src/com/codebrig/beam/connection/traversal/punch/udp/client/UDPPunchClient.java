@@ -106,7 +106,7 @@ public class UDPPunchClient
 
         UDPPunchMessage punchMessage = new UDPPunchMessage (respMessage);
         if (respMessage.isSuccessful ()) {
-            String remoteIP = punchMessage.getIPAddress ();
+            String remoteIP = punchMessage.getIpAddress ();
             int remotePort = punchMessage.getListenPort ();
 
             boolean successfulPunch = false;

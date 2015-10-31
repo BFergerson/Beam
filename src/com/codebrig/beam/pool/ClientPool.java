@@ -30,7 +30,7 @@
 package com.codebrig.beam.pool;
 
 import com.codebrig.beam.BeamClient;
-import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import java.util.Map;
 
 /**
@@ -47,9 +47,9 @@ public interface ClientPool<ClientT extends BeamClient>
 
     public abstract ClientT removeClient (long clientUID);
 
-    public abstract boolean sendDirectMessage (long clientUID, BeamMessage message);
+    public abstract boolean sendDirectMessage (long clientUID, LegacyMessage message);
 
-    public abstract int broadcastMessage (BeamMessage message);
+    public abstract int broadcastMessage (LegacyMessage message);
 
     public abstract void close ();
 

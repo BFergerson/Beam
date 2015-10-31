@@ -41,6 +41,13 @@ import java.util.Arrays;
 public class RawDataMessage extends SystemMessage
 {
 
+    private int blockNumber;
+    private boolean blockRequest;
+    private long blockRequestCode;
+    private long latestBlockRequestCode;
+    private byte[] rawData;
+    private byte[] checksum;
+
     public RawDataMessage (long rawChannelId) {
         super (SystemMessageType.RAW_DATA);
         setMessageId (rawChannelId);
@@ -50,63 +57,58 @@ public class RawDataMessage extends SystemMessage
         super (message);
     }
 
-    public RawDataMessage setRawData (byte[] rawData) {
-        setBytes ("raw_data", rawData);
-        return this;
-    }
-
-    public byte[] getRawData () {
-        return getBytes ("raw_data");
-    }
-
     public RawDataMessage setBlockNumber (int blockNumber) {
-        setInt ("block_number", blockNumber);
+        this.blockNumber = blockNumber;
         return this;
     }
 
-    public Integer getBlockNumber () {
-        return getInt ("block_number");
-    }
-
-    public RawDataMessage setBlockRequestCode (long latestBlockRequestCode) {
-        setLong ("request_code", latestBlockRequestCode);
-        return this;
-    }
-
-    public Long getBlockRequestCode () {
-        return getLong ("request_code");
-    }
-
-    public RawDataMessage setLatestBlockRequestCode (long latestBlockRequestCode) {
-        setLong ("latest_request_code", latestBlockRequestCode);
-        return this;
-    }
-
-    public Long getLatestBlockRequestCode () {
-        return getLong ("latest_request_code");
+    public int getBlockNumber () {
+        return blockNumber;
     }
 
     public RawDataMessage setBlockRequest (boolean blockRequest) {
-        setBoolean ("block_request", blockRequest);
+        this.blockRequest = blockRequest;
         return this;
     }
 
     public boolean isBlockRequest () {
-        Boolean blockRequest = getBoolean ("block_request");
-        if (blockRequest == null) {
-            return false;
-        }
-
         return blockRequest;
     }
 
-    public RawDataMessage setChecksum (byte[] crc64Checksum) {
-        setBytes ("checksum", crc64Checksum);
+    public RawDataMessage setBlockRequestCode (long blockRequestCode) {
+        this.blockRequestCode = blockRequestCode;
+        return this;
+    }
+
+    public long getBlockRequestCode () {
+        return blockRequestCode;
+    }
+
+    public RawDataMessage setLatestBlockRequestCode (long latestBlockRequestCode) {
+        this.latestBlockRequestCode = latestBlockRequestCode;
+        return this;
+    }
+
+    public long getLatestBlockRequestCode () {
+        return latestBlockRequestCode;
+    }
+
+    public RawDataMessage setRawData (byte[] rawData) {
+        this.rawData = rawData;
+        return this;
+    }
+
+    public byte[] getRawData () {
+        return rawData;
+    }
+
+    public RawDataMessage setChecksum (byte[] checksum) {
+        this.checksum = checksum;
         return this;
     }
 
     public byte[] getChecksum () {
-        return getBytes ("checksum");
+        return checksum;
     }
 
     public boolean isValidChecksum () {
@@ -114,7 +116,7 @@ public class RawDataMessage extends SystemMessage
         if (checksum == null) {
             return true;
         }
-        
+
         byte[] rawData = getRawData ();
         CRC64 crc = new CRC64 ();
         crc.update (rawData, 0, rawData.length);

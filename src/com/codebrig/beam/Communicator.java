@@ -664,6 +664,7 @@ public class Communicator implements Runnable
             immediateHandlers.remove (listen);
 
             if (rtnMsg != null) {
+                //todo: below warning
                 if (msg instanceof EncryptedBeamMessage) {
                     //use encryption method in msg to decrypt rtnMsg
                     EncryptedBeamMessage encryptedMessage = (EncryptedBeamMessage) msg;

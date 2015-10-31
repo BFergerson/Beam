@@ -31,8 +31,8 @@ package com.codebrig.beam.unit.crypt;
 
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.crypt.handlers.RSABeamHandler;
-import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -49,7 +49,7 @@ public class RSATestHandler extends RSABeamHandler
         assert (message.get ("rsa_test_variable").equals ("rsa_test_value"));
         System.out.println ("RSA sent message valid!");
 
-        BasicMessage responseMessage = new BasicMessage (BeamCryptTest.RSA_CRYPT_TEST_MESSAGE);
+        LegacyMessage responseMessage = new LegacyMessage (BeamCryptTest.RSA_CRYPT_TEST_MESSAGE);
         responseMessage.setString ("rsa_response_variable", "rsa_response_value");
 
         return responseMessage;

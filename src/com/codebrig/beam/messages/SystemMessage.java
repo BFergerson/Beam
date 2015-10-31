@@ -40,19 +40,15 @@ public class SystemMessage<T extends BeamMessage> extends BeamMessage<T>
     }
 
     public SystemMessage (int type, byte[] data) {
-        super (type, data, true, false);
+        super (type, data, true);
     }
 
     public SystemMessage (boolean rawData, int type, byte[] data, boolean systemMessage) {
-        super (type, data, systemMessage, !rawData);
+        super (type, data, systemMessage);
     }
 
     public SystemMessage (BeamMessage message) {
         super (message);
-    }
-
-    public SystemMessage (BeamMessage message, boolean rawData, boolean parse) {
-        super (message, rawData, parse);
     }
 
     public BeamMessage toBeamMessage () {

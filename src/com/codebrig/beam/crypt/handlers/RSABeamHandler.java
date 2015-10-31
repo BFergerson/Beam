@@ -35,8 +35,8 @@ import com.codebrig.beam.crypt.RSAConnection;
 import com.codebrig.beam.crypt.RSAConnectionHolder;
 import com.codebrig.beam.crypt.messages.RSABeamMessage;
 import com.codebrig.beam.handlers.BeamHandler;
-import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import com.codebrig.beam.messages.SystemMessage;
 
 /**
@@ -51,7 +51,7 @@ public abstract class RSABeamHandler extends BeamHandler
 
     @Override
     public BeamMessage processIncomingMessage (Communicator comm, BeamMessage message) {
-        BasicMessage basicMessage = new BasicMessage (message);
+        LegacyMessage basicMessage = new LegacyMessage (message);
         String session = basicMessage.getString ("beam_rsas");
         byte[] messageData = basicMessage.getBytes ("beam_rsamd");
         String rawData = basicMessage.getString ("beam_rsa_raw");
@@ -72,7 +72,7 @@ public abstract class RSABeamHandler extends BeamHandler
     @Override
     public BeamMessage processOutgoingMessage (Communicator comm,
             BeamMessage originalMessage, BeamMessage responseMessage) {
-        BasicMessage basicMessage = new BasicMessage (originalMessage);
+        LegacyMessage basicMessage = new LegacyMessage (originalMessage);
         String session = basicMessage.getString ("beam_rsas");
         if (session == null) {
             throw new CryptException ("Invalid RSA connection!");
@@ -83,7 +83,7 @@ public abstract class RSABeamHandler extends BeamHandler
             throw new CryptException ("Invalid RSA connection!");
         }
 
-        return new RSABeamMessage (conn, responseMessage);
+        return new RSABeamMessage (conn, new LegacyMessage (responseMessage));
     }
 
 }

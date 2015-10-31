@@ -27,45 +27,36 @@
  *
  * ====
  */
-package com.codebrig.beam.crypt.messages;
+package com.codebrig.beam.handlers;
 
+import com.codebrig.beam.Communicator;
 import com.codebrig.beam.messages.BeamMessage;
-import com.codebrig.beam.messages.SystemMessage;
-import com.codebrig.beam.messages.SystemMessageType;
+import com.codebrig.beam.messages.LegacyMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class RSAHandshakeMessage extends SystemMessage<RSAHandshakeMessage>
+public abstract class LegacyHandler<MessageT extends LegacyMessage> extends BeamHandler
 {
 
-    private String connectionKey;
-    private String session;
-
-    public RSAHandshakeMessage () {
-        super (SystemMessageType.RSA_CONNECTION_HANDSHAKE);
+    public LegacyHandler (int... types) {
+        super (types);
     }
 
-    public RSAHandshakeMessage (BeamMessage message) {
-        super (message);
+    LegacyHandler (boolean systemHandler, int... types) {
+        super (systemHandler, types);
     }
 
-    public RSAHandshakeMessage setConnectionKey (String connectionKey) {
-        this.connectionKey = connectionKey;
-        return this;
+    @Override
+    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
+        return LegacyHandler.this.messageReceived (comm, castMessage (message));
     }
 
-    public String getConnectionKey () {
-        return connectionKey;
+    @Override
+    public LegacyMessage castMessage (BeamMessage message) {
+        return new LegacyMessage (message.getType (), message.getData (), message.isRawData ());
     }
 
-    public RSAHandshakeMessage setSession (String session) {
-        this.session = session;
-        return this;
-    }
-
-    public String getSession () {
-        return session;
-    }
+    public abstract MessageT messageReceived (Communicator comm, MessageT message);
 
 }

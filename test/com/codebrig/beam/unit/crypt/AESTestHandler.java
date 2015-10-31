@@ -31,8 +31,8 @@ package com.codebrig.beam.unit.crypt;
 
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.crypt.handlers.AESBeamHandler;
-import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 
 public class AESTestHandler extends AESBeamHandler
 {
@@ -46,7 +46,7 @@ public class AESTestHandler extends AESBeamHandler
         assert (message.get ("aes_test_variable").equals ("aes_test_value"));
         System.out.println ("AES sent message valid!");
 
-        BasicMessage responseMessage = new BasicMessage (BeamCryptTest.AES_CRYPT_TEST_MESSAGE);
+        LegacyMessage responseMessage = new LegacyMessage (BeamCryptTest.AES_CRYPT_TEST_MESSAGE);
         responseMessage.setString ("aes_response_variable", "aes_response_value");
 
         return responseMessage;

@@ -41,6 +41,10 @@ import java.util.Arrays;
 public class FileDataMessage extends SystemMessage
 {
 
+    private int blockNumber;
+    private byte[] rawData;
+    private byte[] checksum;
+
     public FileDataMessage (long transferChannelId) {
         super (SystemMessageType.FILE_DATA);
 
@@ -51,31 +55,31 @@ public class FileDataMessage extends SystemMessage
         super (message);
     }
 
+    public FileDataMessage setBlockNumber (int blockNumber) {
+        this.blockNumber = blockNumber;
+        return this;
+    }
+
+    public int getBlockNumber () {
+        return blockNumber;
+    }
+
     public FileDataMessage setRawData (byte[] rawData) {
-        setBytes ("raw_data", rawData);
+        this.rawData = rawData;
         return this;
     }
 
     public byte[] getRawData () {
-        return getBytes ("raw_data");
+        return rawData;
     }
 
-    public FileDataMessage setBlockNumber (int blockNumber) {
-        setInt ("block_number", blockNumber);
-        return this;
-    }
-
-    public Integer getBlockNumber () {
-        return getInt ("block_number");
-    }
-
-    public FileDataMessage setChecksum (byte[] crc64Checksum) {
-        setBytes ("checksum", crc64Checksum);
+    public FileDataMessage setChecksum (byte[] checksum) {
+        this.checksum = checksum;
         return this;
     }
 
     public byte[] getChecksum () {
-        return getBytes ("checksum");
+        return checksum;
     }
 
     public boolean isValidChecksum () {

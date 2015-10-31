@@ -33,9 +33,9 @@ import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.connection.raw.RawDataChannel;
-import com.codebrig.beam.handlers.BasicHandler;
-import com.codebrig.beam.messages.BasicMessage;
+import com.codebrig.beam.handlers.LegacyHandler;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 import java.io.IOException;
 
 /**
@@ -60,10 +60,10 @@ public class BeamRawTest
         //start transfer
         RawDataChannel clientRawSocket = client.getCommunicator ().createRawDataChannel ();
 
-        BasicMessage message = new BasicMessage (RAW_SOCKET_INIT_MESSAGE);
+        LegacyMessage message = new LegacyMessage (RAW_SOCKET_INIT_MESSAGE);
         message.setLong ("raw_channel_id", clientRawSocket.getRawChannelId ());
         BeamMessage responseMessage = client.getCommunicator ().send (message);
-        message = new BasicMessage (responseMessage);
+        message = new LegacyMessage (responseMessage);
 
         clientRawSocket.connect (message.getLong ("raw_channel_id"));
 
@@ -83,11 +83,11 @@ public class BeamRawTest
         server = new BeamServer ("Test Server", TEST_PORT);
         server.start ();
 
-        server.addGlobalHandler (new BasicHandler (RAW_SOCKET_INIT_MESSAGE)
+        server.addGlobalHandler (new LegacyHandler (RAW_SOCKET_INIT_MESSAGE)
         {
 
             @Override
-            public BeamMessage messageReceived (Communicator comm, BasicMessage message) {
+            public LegacyMessage messageReceived (Communicator comm, LegacyMessage message) {
                 Long channelId = message.getLong ("raw_channel_id");
                 RawDataChannel rawSocket = comm.createRawDataChannel ();
                 rawSocket.connect (channelId);

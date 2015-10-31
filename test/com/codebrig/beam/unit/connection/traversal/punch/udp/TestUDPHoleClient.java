@@ -31,11 +31,9 @@ package com.codebrig.beam.unit.connection.traversal.punch.udp;
 
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.connection.traversal.punch.udp.client.UDPHoleClient;
-import com.codebrig.beam.messages.BasicMessage;
 import com.codebrig.beam.messages.BeamMessage;
-import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_MESSAGE_TYPE;
-import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_PEER_ACCESS_CODE;
-import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_PEER_IDENTIFIER;
+import com.codebrig.beam.messages.LegacyMessage;
+import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.*;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -63,7 +61,7 @@ public class TestUDPHoleClient
 
         //recieve test message
         BeamMessage message = peerComm.fetchWithWait (Communicator.WAIT_FOREVER, TEST_PUNCH_MESSAGE_TYPE);
-        BasicMessage basicMessage = new BasicMessage (message);
+        LegacyMessage basicMessage = new LegacyMessage (message);
 
         //verify message
         assert (basicMessage.getString ("test_message").equals ("test_data"));

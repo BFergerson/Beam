@@ -27,27 +27,33 @@
  *
  * ====
  */
-package com.codebrig.beam.handlers;
-
-import com.codebrig.beam.Communicator;
-import com.codebrig.beam.messages.BasicMessage;
-import com.codebrig.beam.messages.BeamMessage;
+package com.codebrig.beam.messages;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public abstract class BasicHandler extends BeamHandler
+public class SystemLegacyMessage<T extends LegacyMessage> extends LegacyMessage<T>
 {
 
-    public BasicHandler (int... types) {
-        super (types);
+    public SystemLegacyMessage (int type) {
+        super (type, true);
     }
 
-    @Override
-    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
-        return messageReceived (comm, new BasicMessage (message));
+    public SystemLegacyMessage (int type, byte[] data) {
+        super (type, data, true);
     }
 
-    public abstract BeamMessage messageReceived (Communicator comm, BasicMessage message);
+    public SystemLegacyMessage (boolean rawData, int type, byte[] data, boolean systemMessage) {
+        super (type, data, systemMessage);
+    }
+
+    public SystemLegacyMessage (BeamMessage message) {
+        super (message);
+    }
+
+    public LegacyMessage toBeamMessage () {
+        //used to cast down SystemMessage instance
+        return new LegacyMessage (this);
+    }
 
 }
