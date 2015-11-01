@@ -32,7 +32,7 @@ package com.codebrig.beam.messages;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class SystemMessage<T extends BeamMessage> extends BeamMessage<T>
+public class SystemMessage<MessageT extends SystemMessage> extends BeamMessage<MessageT>
 {
 
     public SystemMessage (int type) {
