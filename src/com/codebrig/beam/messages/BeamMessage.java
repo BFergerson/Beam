@@ -32,6 +32,7 @@ package com.codebrig.beam.messages;
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
+import io.protostuff.runtime.RuntimeSchema;
 import java.util.Arrays;
 
 /**
@@ -86,7 +87,7 @@ public class BeamMessage<MessageT extends BeamMessage>
     }
 
     BeamMessage (int type, byte[] data, boolean systemMessage) {
-        if (type < 0) {
+        if (type < 0 && !systemMessage) {
             throw new InvalidBeamMessage (String.format (
                     "Invalid message type: %s! Beam messages must have a type >= 0.", type));
         }
@@ -99,7 +100,7 @@ public class BeamMessage<MessageT extends BeamMessage>
     }
 
     BeamMessage (int type, byte[] data, boolean systemMessage, boolean rawData) {
-        if (type < 0) {
+        if (type < 0 && !systemMessage) {
             throw new InvalidBeamMessage (String.format (
                     "Invalid message type: %s! Beam messages must have a type >= 0.", type));
         }
@@ -118,7 +119,19 @@ public class BeamMessage<MessageT extends BeamMessage>
         }
 
         this.type = type;
-        this.systemMessage = type < 0;
+        this.systemMessage = systemMessage;
+        this.createdTimestamp = System.currentTimeMillis ();
+    }
+
+    BeamMessage (int type, boolean systemMessage, boolean rawData) {
+        if (type < 0 && !systemMessage) {
+            throw new InvalidBeamMessage (String.format (
+                    "Invalid message type: %s! Beam messages must have a type >= 0.", type));
+        }
+
+        this.type = type;
+        this.systemMessage = systemMessage;
+        this.rawData = rawData;
         this.createdTimestamp = System.currentTimeMillis ();
     }
 
@@ -129,7 +142,7 @@ public class BeamMessage<MessageT extends BeamMessage>
         }
 
         this.type = message.getType ();
-        this.systemMessage = type < 0;
+        this.systemMessage = systemMessage;
         this.createdTimestamp = System.currentTimeMillis ();
         this.rawData = message.isRawData ();
         this.data = message.getData ();
@@ -138,7 +151,7 @@ public class BeamMessage<MessageT extends BeamMessage>
 
     public MessageT copy () {
         //todo: implement
-        return null;
+        return (MessageT) this;
     }
 
     public void copy (MessageT message) {
@@ -237,23 +250,22 @@ public class BeamMessage<MessageT extends BeamMessage>
     }
 
     public byte[] getData () {
+        byte[] rtnData = null;
         if (rawData) {
             return data;
         } else {
-            //serialize
+            //auto-serialize
             LinkedBuffer buffer = getApplicationBuffer ();
-            Schema<MessageT> schema = null;// RuntimeSchema.getSchema (MessageT.class);
-
+            Schema<MessageT> schema = (Schema<MessageT>) RuntimeSchema.getSchema (getClass ());
+            MessageT message = (MessageT) this;
             try {
-                return ProtostuffIOUtil.toByteArray (copy (), schema, buffer);
+                rtnData = ProtostuffIOUtil.toByteArray (message, schema, buffer);
             } finally {
                 buffer.clear ();
             }
         }
-    }
 
-    public int getSize () {
-        return getData ().length;
+        return rtnData;
     }
 
     @Override

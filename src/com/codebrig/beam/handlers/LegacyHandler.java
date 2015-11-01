@@ -49,12 +49,12 @@ public abstract class LegacyHandler<MessageT extends LegacyMessage> extends Beam
 
     @Override
     public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
-        return LegacyHandler.this.messageReceived (comm, castMessage (message));
+        return messageReceived (comm, (MessageT) castMessage (message));
     }
 
     @Override
     public LegacyMessage castMessage (BeamMessage message) {
-        return new LegacyMessage (message.getType (), message.getData (), message.isRawData ());
+        return new LegacyMessage (message.getType (), message.getData (), message.isRawData (), true);
     }
 
     public abstract MessageT messageReceived (Communicator comm, MessageT message);

@@ -48,10 +48,10 @@ import java.util.Map;
 public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
 {
 
-    protected HashMap<String, List<String>> messageMap;
+    protected HashMap<String, List<String>> messageMap = new HashMap<> ();
 
     public LegacyMessage () {
-        super (0);
+        this (0);
     }
 
     /**
@@ -60,17 +60,28 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
      * @param type the type of message
      */
     public LegacyMessage (int type) {
-        super (type);
+        super (type, false, true);
     }
 
     public LegacyMessage (BeamMessage message) {
-        super (message.getType (), message.getData (), message.isRawData ());
+        super (message.getType (), message.getData (), message.isSystemMessage (), message.isRawData ());
+
+        ProtobufMessage.MessageEntrySet entrySet;
+        try {
+            entrySet = ProtobufMessage.MessageEntrySet.parseFrom (message.getData ());
+        } catch (InvalidProtocolBufferException ex) {
+            throw new RuntimeException (ex);
+        }
+
+        List<ProtobufMessage.MessageEntry> entriesList = entrySet.getEntriesList ();
+        for (ProtobufMessage.MessageEntry entry : entriesList) {
+            messageMap.put (entry.getKey (), entry.getValueList ());
+        }
     }
 
     public LegacyMessage (LegacyMessage message) {
         super (message);
 
-        this.messageMap = new HashMap<> ();
         ProtobufMessage.MessageEntrySet entrySet;
         try {
             entrySet = ProtobufMessage.MessageEntrySet.parseFrom (message.getData ());
@@ -91,7 +102,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
      * @param data the raw data to associate with the message
      */
     public LegacyMessage (int type, byte[] data) {
-        this (type, data, false, true);
+        this (type, data, true, true);
     }
 
     /**
@@ -102,18 +113,29 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
      * @param rawData whether or not the data is raw
      */
     public LegacyMessage (int type, byte[] data, boolean rawData) {
-        this (type, data, false, rawData);
+        this (type, data, false, rawData, false);
+    }
+
+    /**
+     * Data message constructor
+     *
+     * @param type the type of message
+     * @param data the data to associate with the message
+     * @param rawData whether or not the data is raw
+     * @param parseData
+     */
+    public LegacyMessage (int type, byte[] data, boolean rawData, boolean parseData) {
+        this (type, data, false, rawData, parseData);
     }
 
     LegacyMessage (int type, boolean systemMessage) {
         super (type, systemMessage);
     }
 
-    LegacyMessage (int type, byte[] data, boolean systemMessage, boolean rawData) {
+    LegacyMessage (int type, byte[] data, boolean systemMessage, boolean rawData, boolean parseData) {
         super (type, data, systemMessage, rawData);
 
-        if (!rawData) {
-            this.messageMap = new HashMap<> ();
+        if (parseData) {
             ProtobufMessage.MessageEntrySet entrySet;
             try {
                 entrySet = ProtobufMessage.MessageEntrySet.parseFrom (data);
@@ -130,10 +152,6 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
 
     @Override
     public byte[] getData () {
-        if (isRawData ()) {
-            return super.getData ();
-        }
-
         ProtobufMessage.MessageEntrySet.Builder entrySetBuilder = ProtobufMessage.MessageEntrySet.newBuilder ();
         Iterator<Map.Entry<String, List<String>>> entryItr = messageMap.entrySet ().iterator ();
         while (entryItr.hasNext ()) {
@@ -146,13 +164,6 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         }
 
         return entrySetBuilder.build ().toByteArray ();
-    }
-
-    /**
-     * @return message size
-     */
-    public int getSize () {
-        return getData ().length;
     }
 
     public T remove (String key) {
@@ -190,8 +201,8 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
             String[] strArray = new String[value.length];
             for (int i = 0; i < strArray.length; i++) {
                 if (value[i] != null) {
-                    byte[] header = getHeader ();
                     byte[] messageData = value[i].getData ();
+                    byte[] header = getHeader (messageData.length);
 
                     byte[] result = new byte[header.length + messageData.length];
                     System.arraycopy (header, 0, result, 0, header.length);
@@ -500,6 +511,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return (T) this;
     }
 
+    @Override
     public T response () {
         return (T) this;
     }
@@ -508,6 +520,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return (T) response ().clear ();
     }
 
+    @Override
     public T successResponse () {
         T msg = response ();
         return (T) msg.setSuccessful (true);
@@ -517,6 +530,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return (T) clear ().successResponse ();
     }
 
+    @Override
     public T errorResponse () {
         T msg = response ();
         return (T) msg.setSuccessful (false);
@@ -541,10 +555,10 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return strArray;
     }
 
-    private byte[] getHeader () {
+    private byte[] getHeader (int messageSize) {
         ByteBuffer header = ByteBuffer.allocate (HEADER_SIZE);
         header.putInt (getType ()); //message type
-        header.putInt (getSize ());//message size
+        header.putInt (messageSize);//message size
         header.putLong (getMessageId ());//message id
 
         //data type

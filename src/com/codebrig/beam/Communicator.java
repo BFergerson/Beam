@@ -451,6 +451,7 @@ public class Communicator implements Runnable
 
     private BeamMessage readCommMessage () throws IOException {
         BeamMessage msg;
+        int messageSize = 0;
 
         synchronized (inLock) {
             final byte[] header = readStream (BeamMessage.HEADER_SIZE);
@@ -484,15 +485,16 @@ public class Communicator implements Runnable
 //            }
             //msg.setSentTimestamp (sentTime);
             msg.setReceivedTimestamp (System.currentTimeMillis ());
+            messageSize = size;
         }
 
         if (debugOutput) {
             if (msg.isSystemMessage ()) {
                 System.out.println (String.format ("Received message: %s - Size: %s - Timestamp: %s",
-                        systemMessageType.getName (msg.getType ()), msg.getSize (), new Timestamp (System.currentTimeMillis ())));
+                        systemMessageType.getName (msg.getType ()), messageSize, new Timestamp (System.currentTimeMillis ())));
             } else if (messageType != null) {
                 System.out.println (String.format ("Received message: %s - Size: %s - Timestamp: %s",
-                        messageType.getName (msg.getType ()), msg.getSize (), new Timestamp (System.currentTimeMillis ())));
+                        messageType.getName (msg.getType ()), messageSize, new Timestamp (System.currentTimeMillis ())));
             }
         }
 
@@ -569,10 +571,10 @@ public class Communicator implements Runnable
         return msg != null;
     }
 
-    private byte[] getHeader (BeamMessage msg) {
+    private byte[] getHeader (BeamMessage msg, int messageSize) {
         ByteBuffer header = ByteBuffer.allocate (BeamMessage.HEADER_SIZE);
         header.putInt (msg.getType ()); //message type
-        header.putInt (msg.getSize ());//message size
+        header.putInt (messageSize);//message size
         header.putLong (msg.getMessageId ());//message id
 
         //data type
@@ -593,7 +595,7 @@ public class Communicator implements Runnable
         try {
             synchronized (outLock) {
                 byte[] data = msg.getData ();
-                byte[] header = getHeader (msg);
+                byte[] header = getHeader (msg, data.length);
                 byte[] headerWithData = new byte[BeamMessage.HEADER_SIZE + data.length];
 
                 System.arraycopy (header, 0, headerWithData, 0, header.length);
@@ -604,10 +606,10 @@ public class Communicator implements Runnable
                 if (debugOutput) {
                     if (msg.isSystemMessage ()) {
                         System.out.println (String.format ("Sent message: %s - Size: %s - Timestamp: %s",
-                                systemMessageType.getName (msg.getType ()), msg.getSize (), new Timestamp (System.currentTimeMillis ())));
+                                systemMessageType.getName (msg.getType ()), data.length, new Timestamp (System.currentTimeMillis ())));
                     } else if (messageType != null) {
                         System.out.println (String.format ("Sent message: %s - Size: %s - Timestamp: %s",
-                                messageType.getName (msg.getType ()), msg.getSize (), new Timestamp (System.currentTimeMillis ())));
+                                messageType.getName (msg.getType ()), data.length, new Timestamp (System.currentTimeMillis ())));
                     }
                 }
             }
