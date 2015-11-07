@@ -451,7 +451,7 @@ public class Communicator implements Runnable
 
     private BeamMessage readCommMessage () throws IOException {
         BeamMessage msg;
-        int messageSize = 0;
+        int messageSize;
 
         synchronized (inLock) {
             final byte[] header = readStream (BeamMessage.HEADER_SIZE);
@@ -461,7 +461,7 @@ public class Communicator implements Runnable
             final int size = headerBuf.getInt (); //message size
             final long id = headerBuf.getLong (); //message id
             final boolean rawData = headerBuf.get () == 1;
-
+            
             if (size > BeamMessage.MAX_MESSAGE_SIZE || size < 0) {
                 //message too big or invalid; other end isn't playing nice. drop connection
                 close ();
@@ -471,7 +471,6 @@ public class Communicator implements Runnable
             //final long sentTime = longFromBytes (readStream (8)); //message time
             //final int version = intFromBytes (readStream (4)); //message version
             //final int messageId = intFromBytes (readStream (4)); //message id
-            
             byte[] data = readStream (size);
             msg = new SystemMessage (rawData, type, data, type < 0).toBeamMessage (data);
             msg.setMessageId (id);
@@ -604,6 +603,9 @@ public class Communicator implements Runnable
                     } else if (messageType != null) {
                         System.out.println (String.format ("Sent message: %s - Size: %s - Timestamp: %s",
                                 messageType.getName (msg.getType ()), data.length, new Timestamp (System.currentTimeMillis ())));
+                    } else {
+                        System.out.println (String.format ("Sent message: %s - Size: %s - Timestamp: %s",
+                                msg.getType (), data.length, new Timestamp (System.currentTimeMillis ())));
                     }
                 }
             }
