@@ -36,6 +36,7 @@ import com.codebrig.beam.crypt.RSA;
 import com.codebrig.beam.crypt.RSAConnection;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.LegacyMessage;
+import com.codebrig.beam.messages.SystemMessage;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -71,7 +72,7 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
         AES aes = rsaConnection.getAES ();
         RSA publicRSA = rsaConnection.getPublicRSA ();
         byte[] messageData = super.getData ();
-        
+
         if (isRawData ()) {
             message.setString ("beam_rsa_raw", "true");
         } else {
@@ -98,13 +99,13 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
             String rsaRaw = basicMessage.getString ("beam_rsa_raw");
 
             if (aes == null || rsaConnection.getSession () == null) {
-                byte[] data = publicRSA.decrypt (messageData);
-
-                LegacyMessage decryptedMessage = new LegacyMessage (message.getType (), data, "false".equals (rsaRaw));
-                return decryptedMessage;
+                byte[] decryptedData = publicRSA.decrypt (messageData);
+                return new SystemMessage (message.getType (), decryptedData, message.isSystemMessage (),
+                        Boolean.valueOf (rsaRaw)).toBeamMessage (decryptedData);
             } else {
-                byte[] data = aes.decrypt (messageData);
-                return new LegacyMessage (message.getType (), data, "false".equals (rsaRaw));
+                byte[] decryptedData = aes.decrypt (messageData);
+                return new SystemMessage (message.getType (), decryptedData, message.isSystemMessage (),
+                        Boolean.valueOf (rsaRaw)).toBeamMessage (decryptedData);
             }
         } catch (Exception ex) {
             throw new CryptException (ex);

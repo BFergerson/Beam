@@ -59,8 +59,9 @@ public class AESBeamMessage extends BeamMessage implements EncryptedBeamMessage
 
     @Override
     public BeamMessage decryptBeamMessage (BeamMessage message) {
-        return new SystemMessage (message.isRawData (), message.getType (),
-                aes.decrypt (message.getData ()), message.isSystemMessage ());
+        byte[] decryptedData = aes.decrypt (message.getData ());
+        return new SystemMessage (message.getType (), decryptedData, message.isSystemMessage (),
+                message.isRawData ()).toBeamMessage (decryptedData);
     }
 
 }

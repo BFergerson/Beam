@@ -43,7 +43,7 @@ public class SystemMessage<MessageT extends SystemMessage> extends BeamMessage<M
         super (type, data, true);
     }
 
-    public SystemMessage (boolean rawData, int type, byte[] data, boolean systemMessage) {
+    public SystemMessage (int type, byte[] data, boolean systemMessage, boolean rawData) {
         super (type, data, systemMessage, rawData);
     }
 

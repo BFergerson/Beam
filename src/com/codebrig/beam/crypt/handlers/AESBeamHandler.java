@@ -52,16 +52,16 @@ public abstract class AESBeamHandler extends BeamHandler
     @Override
     public BeamMessage processIncomingMessage (Communicator comm, BeamMessage message) {
         byte[] decryptedData = aes.decrypt (message.getData ());
-        return new SystemMessage (message.isRawData (), message.getType (),
-                decryptedData, message.isSystemMessage ()).toBeamMessage ();
+        return new SystemMessage (message.getType (), decryptedData, message.isSystemMessage (),
+                message.isRawData ()).toBeamMessage (decryptedData);
     }
 
     @Override
     public BeamMessage processOutgoingMessage (Communicator comm,
             BeamMessage originalMessage, BeamMessage responseMessage) {
         byte[] encryptedData = aes.encrypt (responseMessage.getData ());
-        return new SystemMessage (true, responseMessage.getType (),
-                encryptedData, responseMessage.isSystemMessage ());
+        return new SystemMessage (responseMessage.getType (), encryptedData, 
+                responseMessage.isSystemMessage (), true);
     }
 
 }

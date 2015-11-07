@@ -65,8 +65,8 @@ public abstract class RSABeamHandler extends BeamHandler
         }
 
         byte[] decryptedData = conn.getAES ().decrypt (messageData);
-        return new SystemMessage ("true".equals (rawData), message.getType (),
-                decryptedData, message.isSystemMessage ()).toBeamMessage (message.getData ());
+        return new SystemMessage (message.getType (), decryptedData, message.isSystemMessage (),
+                Boolean.valueOf (rawData)).toBeamMessage (decryptedData);
     }
 
     @Override
@@ -83,7 +83,7 @@ public abstract class RSABeamHandler extends BeamHandler
             throw new CryptException ("Invalid RSA connection!");
         }
 
-        return new RSABeamMessage (conn, new LegacyMessage (responseMessage));
+        return new RSABeamMessage (conn, responseMessage);
     }
 
 }

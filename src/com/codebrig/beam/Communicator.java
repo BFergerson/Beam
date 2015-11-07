@@ -461,7 +461,7 @@ public class Communicator implements Runnable
             final int size = headerBuf.getInt (); //message size
             final long id = headerBuf.getLong (); //message id
             final boolean rawData = headerBuf.get () == 1;
-            
+
             if (size > BeamMessage.MAX_MESSAGE_SIZE || size < 0) {
                 //message too big or invalid; other end isn't playing nice. drop connection
                 close ();
@@ -472,7 +472,7 @@ public class Communicator implements Runnable
             //final int version = intFromBytes (readStream (4)); //message version
             //final int messageId = intFromBytes (readStream (4)); //message id
             byte[] data = readStream (size);
-            msg = new SystemMessage (rawData, type, data, type < 0).toBeamMessage (data);
+            msg = new SystemMessage (type, data, type < 0, rawData).toBeamMessage (data);
             msg.setMessageId (id);
             msg.setReceivedTimestamp (System.currentTimeMillis ());
             messageSize = size;

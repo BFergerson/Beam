@@ -105,7 +105,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
      * @param data the raw data to associate with the message
      */
     public LegacyMessage (int type, byte[] data) {
-        this (type, data, true, false);
+        this (type, data, true);
     }
 
     /**

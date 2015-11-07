@@ -65,8 +65,8 @@ public abstract class RSABeamLegacyHandler extends LegacyHandler
         }
 
         byte[] decryptedData = conn.getAES ().decrypt (messageData);
-        return new SystemMessage ("true".equals (rawData), message.getType (),
-                decryptedData, message.isSystemMessage ());
+        return new SystemMessage (message.getType (), decryptedData, message.isSystemMessage (),
+                Boolean.valueOf (rawData)).toBeamMessage (decryptedData);
     }
 
     @Override
