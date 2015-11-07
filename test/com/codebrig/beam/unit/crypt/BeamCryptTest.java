@@ -97,14 +97,13 @@ public class BeamCryptTest
     }
 
     private static void checkAES () {
-        LegacyMessage sendMessage = new LegacyMessage (new AESBeamMessage (
-                aes, AES_CRYPT_TEST_MESSAGE));
-
         //set message data
+        LegacyMessage sendMessage = new LegacyMessage (AES_CRYPT_TEST_MESSAGE);
         sendMessage.set ("aes_test_variable", "aes_test_value");
 
-        //send and recieve response
-        LegacyMessage responseMessage = new LegacyMessage (client.getCommunicator ().send (sendMessage));
+        //send encrypted message and recieve response (automatically decrypted)
+        AESBeamMessage encryptedMessage = new AESBeamMessage (aes, sendMessage);
+        LegacyMessage responseMessage = new LegacyMessage (client.getCommunicator ().send (encryptedMessage));
 
         //check response data
         assert (responseMessage.get ("aes_response_variable").equals ("aes_response_value"));
@@ -114,14 +113,13 @@ public class BeamCryptTest
     private static void checkRSA () {
         RSAConnection rsaConn = client.establishRSAConnection (serverRSA);
 
-        LegacyMessage sendMessage = new LegacyMessage (new RSABeamMessage (
-                rsaConn, RSA_CRYPT_TEST_MESSAGE));
-
         //set message data
-        sendMessage.set ("rsa_test_variable", "rsa_test_value");
+        LegacyMessage dataMessage = new LegacyMessage (RSA_CRYPT_TEST_MESSAGE);
+        dataMessage.set ("rsa_test_variable", "rsa_test_value");
 
-        //send and recieve response
-        LegacyMessage responseMessage = new LegacyMessage (client.getCommunicator ().send (sendMessage));
+        //send encrypted message and recieve response (automatically decrypted)
+        RSABeamMessage encryptedMessage = new RSABeamMessage (rsaConn, dataMessage);
+        LegacyMessage responseMessage = new LegacyMessage (client.getCommunicator ().send (encryptedMessage));
 
         //check response data
         assert (responseMessage.get ("rsa_response_variable").equals ("rsa_response_value"));

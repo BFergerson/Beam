@@ -150,7 +150,9 @@ public class BeamMessage<MessageT extends BeamMessage>
         this.successful = message.isSuccessful ();
         this.errorMessage = message.getErrorMessage ();
 
-        if (!rawData) {
+        if (rawData) {
+            this.data = message.getData ();
+        } else {
             if (data != null) {
                 autoDeserialize (data);
             } else {

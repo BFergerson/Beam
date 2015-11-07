@@ -29,6 +29,7 @@
  */
 package com.codebrig.beam.messages;
 
+import com.codebrig.beam.crypt.EncryptedBeamMessage;
 import com.codebrig.beam.utils.Base64;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.math.BigInteger;
@@ -66,16 +67,18 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
     public LegacyMessage (BeamMessage message) {
         super (message);
 
-        ProtobufMessage.MessageEntrySet entrySet;
-        try {
-            entrySet = ProtobufMessage.MessageEntrySet.parseFrom (message.getData ());
-        } catch (InvalidProtocolBufferException ex) {
-            throw new RuntimeException (ex);
-        }
+        if (!(message instanceof EncryptedBeamMessage)) {
+            ProtobufMessage.MessageEntrySet entrySet;
+            try {
+                entrySet = ProtobufMessage.MessageEntrySet.parseFrom (message.getData ());
+            } catch (InvalidProtocolBufferException ex) {
+                throw new RuntimeException (ex);
+            }
 
-        List<ProtobufMessage.MessageEntry> entriesList = entrySet.getEntriesList ();
-        for (ProtobufMessage.MessageEntry entry : entriesList) {
-            messageMap.put (entry.getKey (), entry.getValueList ());
+            List<ProtobufMessage.MessageEntry> entriesList = entrySet.getEntriesList ();
+            for (ProtobufMessage.MessageEntry entry : entriesList) {
+                messageMap.put (entry.getKey (), entry.getValueList ());
+            }
         }
     }
 
@@ -102,7 +105,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
      * @param data the raw data to associate with the message
      */
     public LegacyMessage (int type, byte[] data) {
-        this (type, data, true, true);
+        this (type, data, true, false);
     }
 
     /**

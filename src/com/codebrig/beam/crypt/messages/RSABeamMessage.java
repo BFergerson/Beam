@@ -44,7 +44,6 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
 {
 
     private final RSAConnection rsaConnection;
-    private byte[] rawData;
 
     public RSABeamMessage (RSAConnection rsaConnection, int type) {
         super (type);
@@ -56,7 +55,7 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
         this.rsaConnection = rsaConnection;
     }
 
-    public RSABeamMessage (RSAConnection rsaConnection, LegacyMessage message) {
+    public RSABeamMessage (RSAConnection rsaConnection, BeamMessage message) {
         super (message);
 
         if (rsaConnection == null) {
@@ -64,10 +63,6 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
         }
 
         this.rsaConnection = rsaConnection;
-
-        if (message.isRawData ()) {
-            rawData = message.getData ();
-        }
     }
 
     @Override
@@ -75,12 +70,11 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
         LegacyMessage message = new LegacyMessage (getType ());
         AES aes = rsaConnection.getAES ();
         RSA publicRSA = rsaConnection.getPublicRSA ();
-        byte[] messageData;
-        if (rawData != null) {
-            messageData = rawData;
+        byte[] messageData = super.getData ();
+        
+        if (isRawData ()) {
             message.setString ("beam_rsa_raw", "true");
         } else {
-            messageData = super.getData ();
             message.setString ("beam_rsa_raw", "false");
         }
 
@@ -94,6 +88,7 @@ public class RSABeamMessage extends BeamMessage implements EncryptedBeamMessage
         return message.getData ();
     }
 
+    @Override
     public BeamMessage decryptBeamMessage (BeamMessage message) {
         try {
             LegacyMessage basicMessage = new LegacyMessage (message);

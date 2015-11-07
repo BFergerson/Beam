@@ -66,7 +66,7 @@ public abstract class RSABeamHandler extends BeamHandler
 
         byte[] decryptedData = conn.getAES ().decrypt (messageData);
         return new SystemMessage ("true".equals (rawData), message.getType (),
-                decryptedData, message.isSystemMessage ());
+                decryptedData, message.isSystemMessage ()).toBeamMessage (message.getData ());
     }
 
     @Override
