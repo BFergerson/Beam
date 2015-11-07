@@ -29,7 +29,7 @@ server.start ();
 A Beam server works with message handlers. Each handler has the ability to accept one or more different types of messages
 
 ```java
-public class ExampleHandler extends BasicHandler
+public class ExampleHandler extends LegacyHandler
 {
 
 	public ExampleHandler () {
@@ -37,7 +37,7 @@ public class ExampleHandler extends BasicHandler
 	}
 
 	@Override
-	public BeamMessage messageRecieved (Communicator comm, BasicMessage msg) {
+	public LegacyMessage messageRecieved (Communicator comm, LegacyMessage msg) {
 		System.out.println ("Client sent message: " + msg.getString ("client_message"));
 
 		//response message
@@ -46,7 +46,7 @@ public class ExampleHandler extends BasicHandler
 }
 ```
 
-Note: Most handlers extend BeamHandler. BasicHandler is used in this example to allow for easier message manipulation.
+Note: Most handlers extend BeamHandler. LegacyHandler is used in this example to allow for easier message manipulation.
 
 Now that you have created a handler you will need to add that handler to the server.
 ```java
@@ -70,7 +70,7 @@ client.connect ();
 ## Creating Messages ##
 
 ```java
-public class ExampleMessage extends BasicMessage
+public class ExampleMessage extends LegacyMessage
 {
 	public final static int EXAMPLE_MESSAGE_ID = 1000;
 	
@@ -86,13 +86,13 @@ public class ExampleMessage extends BasicMessage
 
 ```
 
-Note: Most messages extends BeamMessage. BasicMessage is being extending in this example to allow for easier message manipulation.
+Note: Most messages extends BeamMessage. LegacyMessage is being extending in this example to allow for easier message manipulation.
 
 ## Sending Messages ##
 
 Sending a message will send a message and block while waiting for a response.
 
-To create and send a BasicMessage to the server from client
+To create and send a LegacyMessage to the server from client
 ```java
 ExampleMessage exampleMessage = new ExampleMessage ();
 exampleMessage.setString ("client_message", "example_client_message");
@@ -107,7 +107,7 @@ System.out.println ("Server response: " + exampleMessage.getString ("server_resp
 
 Exchanging a message will send a message and update the original message with the response message given. Useful when the request and response message are the same class as it avoids unnessecary casting like when sending messages.
 
-To create and exchange a BasicMessage to the server from client
+To create and exchange a LegacyMessage to the server from client
 ```java
 ExampleMessage exampleMessage = new ExampleMessage ();
 exampleMessage.setString ("client_message", "example_client_message");
@@ -123,7 +123,7 @@ if (client.exchangeMessage (exampleMessage)) {
 
 Queuing a message sends a message without waiting for a response.
 
-To create and queue a BasicMessage to the server from client
+To create and queue a LegacyMessage to the server from client
 ```java
 ExampleMessage exampleMessage = new ExampleMessage ();
 exampleMessage.setString ("client_message", "example_client_message");
@@ -170,7 +170,7 @@ public class ExampleAESHandler extends AESBeamHandler
 	public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
 		System.out.println ("Client sent secret: " + message.get ("secret_variable"));
 
-		BasicMessage responseMessage = new BasicMessage (ENCRYPTED_MESSAGE_ID);
+		LegacyMessage responseMessage = new LegacyMessage (ENCRYPTED_MESSAGE_ID);
 		responseMessage.setString ("server_response", "server_secret_value");
 		return responseMessage;
 	}
@@ -206,7 +206,7 @@ public class ExampleRSAHandler extends RSABeamHandler
 	public BeamMessage messageRecieved (Communicator comm, BeamMessage message) {
 		System.out.println ("Client sent secret: " + message.get ("secret_variable"));
 
-		BasicMessage responseMessage = new BasicMessage (ENCRYPTED_MESSAGE_ID);
+		LegacyMessage responseMessage = new LegacyMessage (ENCRYPTED_MESSAGE_ID);
 		responseMessage.setString ("server_response", "server_secret_value");
 		return responseMessage;
 	}
@@ -231,11 +231,11 @@ upnpControl.addPortMapping ("Example UPNP Connection", 45800, 45800);
 
 //receive message from Client B
 BeamMessage message = peerComm.fetchWithWait (Communicator.WAIT_FOREVER, EXAMPLE_UPNP_MESSAGE);
-BasicMessage basicMessage = new BasicMessage (message);
-System.out.println ("Client B sent: " + basicMessage.getString ("client_message"));
+LegacyMessage legacyMessage = new LegacyMessage (message);
+System.out.println ("Client B sent: " + legacyMessage.getString ("client_message"));
 
 //queue response to Client B
-peerComm.queue (basicMessage.emptyResponse ().setString ("client_message", "Hello from Client A!"));
+peerComm.queue (legacyMessage.emptyResponse ().setString ("client_message", "Hello from Client A!"));
 ```
 
 Client B
@@ -245,13 +245,13 @@ BeamClient client = new BeamClient (CLIENT_IP_ADDRESS, 45800);
 client.connect ();
 
 //send message to Client A
-BasicMessage message = new BasicMessage (EXAMPLE_UPNP_MESSAGE);
+LegacyMessage message = new LegacyMessage (EXAMPLE_UPNP_MESSAGE);
 message.setString ("client_message", "Hello from Client B!");
 BeamMessage rtnMessage = peerComm.send (message);
 
 //convert and output Client A response
-message = new BasicMessage (rtnMessage);
-System.out.println ("Client A sent: " + basicMessage.getString ("client_message"));
+message = new LegacyMessage (rtnMessage);
+System.out.println ("Client A sent: " + legacyMessage.getString ("client_message"));
 ```
 
 ### UDP Hole Punching ###
@@ -263,11 +263,11 @@ Communicator peerComm = holeClient.createHoleCommunicator (PEER_IDENTIFIER, PEER
 
 //receive message from Client B
 BeamMessage message = peerComm.fetchWithWait (Communicator.WAIT_FOREVER, EXAMPLE_PUNCH_MESSAGE);
-BasicMessage basicMessage = new BasicMessage (message);
-System.out.println ("Client B sent: " + basicMessage.getString ("client_message"));
+LegacyMessage legacyMessage = new LegacyMessage (message);
+System.out.println ("Client B sent: " + legacyMessage.getString ("client_message"));
 
 //queue response to Client B
-peerComm.queue (basicMessage.emptyResponse ().setString ("client_message", "Hello from Client A!"));
+peerComm.queue (legacyMessage.emptyResponse ().setString ("client_message", "Hello from Client A!"));
 ```
 
 Client B
@@ -281,11 +281,11 @@ if (peerComm == null) {
 }
 
 //send message to Client A
-BasicMessage message = new BasicMessage (TEST_PUNCH_MESSAGE_TYPE);
+LegacyMessage message = new LegacyMessage (TEST_PUNCH_MESSAGE_TYPE);
 message.setString ("client_message", "Hello from Client B!");
 BeamMessage rtnMessage = peerComm.send (message);
 
 //convert and output Client A response
-message = new BasicMessage (rtnMessage);
-System.out.println ("Client A sent: " + basicMessage.getString ("client_message"));
+message = new LegacyMessage (rtnMessage);
+System.out.println ("Client A sent: " + legacyMessage.getString ("client_message"));
 ```
