@@ -54,7 +54,7 @@ public abstract class LegacyHandler<MessageT extends LegacyMessage> extends Beam
 
     @Override
     public LegacyMessage castMessage (BeamMessage message) {
-        return new LegacyMessage (message.getType (), message.getData (), message.isRawData (), true);
+        return new LegacyMessage (message);
     }
 
     public abstract MessageT messageReceived (Communicator comm, MessageT message);

@@ -45,7 +45,7 @@ public class RawDataMessage extends SystemMessage
     private boolean blockRequest;
     private long blockRequestCode;
     private long latestBlockRequestCode;
-    private byte[] rawData;
+    private byte[] _rawData;
     private byte[] checksum;
 
     public RawDataMessage (long rawChannelId) {
@@ -94,12 +94,12 @@ public class RawDataMessage extends SystemMessage
     }
 
     public RawDataMessage setRawData (byte[] rawData) {
-        this.rawData = rawData;
+        this._rawData = rawData;
         return this;
     }
 
     public byte[] getRawData () {
-        return rawData;
+        return _rawData;
     }
 
     public RawDataMessage setChecksum (byte[] checksum) {

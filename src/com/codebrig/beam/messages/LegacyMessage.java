@@ -64,7 +64,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
     }
 
     public LegacyMessage (BeamMessage message) {
-        super (message.getType (), message.getData (), message.isSystemMessage (), message.isRawData ());
+        super (message);
 
         ProtobufMessage.MessageEntrySet entrySet;
         try {

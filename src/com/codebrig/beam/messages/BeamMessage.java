@@ -65,7 +65,7 @@ public class BeamMessage<MessageT extends BeamMessage>
     }
 
     public BeamMessage (BeamMessage message) {
-        this (message, message.isRawData ());
+        this (message, message.isSystemMessage ());
     }
 
     /**
@@ -141,12 +141,34 @@ public class BeamMessage<MessageT extends BeamMessage>
                     "Invalid message type: %s! Beam messages must have a type >= 0.", message.getType ()));
         }
 
+        this.data = message.data;
         this.type = message.getType ();
         this.systemMessage = systemMessage;
         this.createdTimestamp = System.currentTimeMillis ();
         this.rawData = message.isRawData ();
-        this.data = message.getData ();
         this.messageId = message.getMessageId ();
+        this.successful = message.isSuccessful ();
+        this.errorMessage = message.getErrorMessage ();
+
+        if (!rawData) {
+            if (data != null) {
+                autoDeserialize (data);
+            } else {
+                autoDeserialize (message.getData ());
+            }
+        }
+    }
+
+    private void autoDeserialize (byte[] data) {
+        if (data != null && data.length > 0) {
+            LinkedBuffer buffer = BeamMessage.getMessageBuffer ();
+            Schema<MessageT> schema = (Schema<MessageT>) RuntimeSchema.getSchema (getClass ());
+            try {
+                ProtostuffIOUtil.mergeFrom (data, (MessageT) this, schema);
+            } finally {
+                buffer.clear ();
+            }
+        }
     }
 
     public MessageT copy () {
@@ -255,7 +277,7 @@ public class BeamMessage<MessageT extends BeamMessage>
             return data;
         } else {
             //auto-serialize
-            LinkedBuffer buffer = getApplicationBuffer ();
+            LinkedBuffer buffer = getMessageBuffer ();
             Schema<MessageT> schema = (Schema<MessageT>) RuntimeSchema.getSchema (getClass ());
             MessageT message = (MessageT) this;
             try {
@@ -311,7 +333,7 @@ public class BeamMessage<MessageT extends BeamMessage>
         }
     };
 
-    private static LinkedBuffer getApplicationBuffer () {
+    public static LinkedBuffer getMessageBuffer () {
         return localBuffer.get ();
     }
 

@@ -170,10 +170,10 @@ public class FileTransferChannel extends SystemHandler
                     //send data
                     FileDataMessage dataMessage = new FileDataMessage (remoteTransferChannelId);
                     dataMessage.setBlockNumber (blockNumber);
-                    dataMessage.setRawData (readBuffer);
+                    dataMessage.setFileData (readBuffer);
 
                     comm.getCommunicator ().queue (dataMessage);
-                    log.info (String.format ("Sent - FileDataMessage; Block number: %s, Block size: %s",
+                    log.finest (String.format ("Sent - FileDataMessage; Block number: %s, Block size: %s",
                             blockNumber, dataMessage.getData ().length));
 
                     burstCount++;
@@ -283,18 +283,18 @@ public class FileTransferChannel extends SystemHandler
                     log.finest (String.format ("Parsing FileDataMessage; Block number: %s, File write position: %s",
                             dataMessage.getBlockNumber (), startPos));
 
-                    byte[] rawData = dataMessage.getRawData ();
+                    byte[] fileData = dataMessage.getFileData ();
                     raf.seek (startPos);
-                    raf.write (rawData);
+                    raf.write (fileData);
                     raf.getFD ().sync ();
-                    recievedData += rawData.length;
+                    recievedData += fileData.length;
 
                     capturedBlockSet.remove (dataMessage);
                     downloadedBlockSet.add (dataMessage.getBlockNumber ());
 
                     if (tracker != null) {
                         try {
-                            tracker.updateStats (fileSize, recievedData, rawData.length, System.currentTimeMillis () - lastProcessedBlockTime);
+                            tracker.updateStats (fileSize, recievedData, fileData.length, System.currentTimeMillis () - lastProcessedBlockTime);
                         } catch (Exception ex) {
                             ex.printStackTrace ();
                         }
@@ -345,7 +345,7 @@ public class FileTransferChannel extends SystemHandler
         if (message.getType () == SystemMessageType.FILE_DATA) {
             FileDataMessage fdm = new FileDataMessage (message);
             log.finest (String.format ("Received - FileDataMessage; Block number: %s, Block size: %s",
-                    fdm.getBlockNumber (), fdm.getRawData ().length));
+                    fdm.getBlockNumber (), fdm.getFileData ().length));
             capturedBlockSet.add (fdm);
         } else {
             FileBurstMessage burstMessage = new FileBurstMessage (message);

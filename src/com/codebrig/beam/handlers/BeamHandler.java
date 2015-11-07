@@ -105,12 +105,14 @@ public abstract class BeamHandler<MessageT extends BeamMessage>
 
     public final MessageT processMessage (final Communicator comm, final MessageT message) {
         MessageT processedMessage = processIncomingMessage (comm, message);
-        processedMessage = messageReceived (comm, castMessage (processedMessage));
+        MessageT castedMessage = castMessage (processedMessage);
+        castedMessage.setMessageId (message.getMessageId ());
 
+        processedMessage = messageReceived (comm, castedMessage);
         if (processedMessage != null) {
             processedMessage = processOutgoingMessage (comm, message, processedMessage);
 
-            if (message.getMessageId () != -1 && processedMessage != null) {
+            if (processedMessage != null && processedMessage.getMessageId () == -1) {
                 processedMessage.setMessageId (message.getMessageId ());
             }
         }

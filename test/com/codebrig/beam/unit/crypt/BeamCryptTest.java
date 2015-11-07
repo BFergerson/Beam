@@ -38,7 +38,6 @@ import com.codebrig.beam.crypt.RSAConnection;
 import com.codebrig.beam.crypt.handlers.RSAHandshakeHandler;
 import com.codebrig.beam.crypt.messages.AESBeamMessage;
 import com.codebrig.beam.crypt.messages.RSABeamMessage;
-import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.LegacyMessage;
 import java.io.IOException;
 

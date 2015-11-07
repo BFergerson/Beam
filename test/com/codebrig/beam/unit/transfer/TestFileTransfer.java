@@ -96,8 +96,7 @@ public class TestFileTransfer
                 FileTransferChannel fileChannel = comm.createFileTransferChannel ();
                 fileChannel.connect (message.getLong ("channel_id"));
 
-                message.clear ();
-                message.setSuccessful (true).setLong ("channel_id", fileChannel.getTransferChannelId ());
+                message = message.emptySuccessResponse ().setLong ("channel_id", fileChannel.getTransferChannelId ());
                 comm.queue (message);
 
                 try {

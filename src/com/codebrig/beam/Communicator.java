@@ -471,19 +471,10 @@ public class Communicator implements Runnable
             //final long sentTime = longFromBytes (readStream (8)); //message time
             //final int version = intFromBytes (readStream (4)); //message version
             //final int messageId = intFromBytes (readStream (4)); //message id
-//            if (tunnelClient == null) {
-            msg = new SystemMessage (rawData, type, readStream (size), type < 0).toBeamMessage ();
+            
+            byte[] data = readStream (size);
+            msg = new SystemMessage (rawData, type, data, type < 0).toBeamMessage (data);
             msg.setMessageId (id);
-//            } else {
-//                byte[] buf = new byte[size];
-////                if (size <= 10) {
-////                    tunnelClient.readFull (buf, 0, size, true);
-////                } else {
-//                    tunnelClient.read (buf, 0, size);
-////                }
-//                msg = new BeamMessage (type, buf, type < 0);
-//            }
-            //msg.setSentTimestamp (sentTime);
             msg.setReceivedTimestamp (System.currentTimeMillis ());
             messageSize = size;
         }
@@ -492,9 +483,12 @@ public class Communicator implements Runnable
             if (msg.isSystemMessage ()) {
                 System.out.println (String.format ("Received message: %s - Size: %s - Timestamp: %s",
                         systemMessageType.getName (msg.getType ()), messageSize, new Timestamp (System.currentTimeMillis ())));
-            } else if (messageType != null) {
+            } else if (messageType != null && messageType.getName (msg.getType ()) != null) {
                 System.out.println (String.format ("Received message: %s - Size: %s - Timestamp: %s",
                         messageType.getName (msg.getType ()), messageSize, new Timestamp (System.currentTimeMillis ())));
+            } else {
+                System.out.println (String.format ("Received message: %s - Size: %s - Timestamp: %s",
+                        msg.getType (), messageSize, new Timestamp (System.currentTimeMillis ())));
             }
         }
 
@@ -664,6 +658,11 @@ public class Communicator implements Runnable
 
             //now remove and return
             immediateHandlers.remove (listen);
+
+            //check listener once more just in case
+            if (rtnMsg == null && listen.message != null) {
+                rtnMsg = listen.message;
+            }
 
             if (rtnMsg != null) {
                 //todo: below warning

@@ -42,7 +42,7 @@ public class FileDataMessage extends SystemMessage
 {
 
     private int blockNumber;
-    private byte[] rawData;
+    private byte[] fileData;
     private byte[] checksum;
 
     public FileDataMessage (long transferChannelId) {
@@ -64,13 +64,13 @@ public class FileDataMessage extends SystemMessage
         return blockNumber;
     }
 
-    public FileDataMessage setRawData (byte[] rawData) {
-        this.rawData = rawData;
+    public FileDataMessage setFileData (byte[] fileData) {
+        this.fileData = fileData;
         return this;
     }
 
-    public byte[] getRawData () {
-        return rawData;
+    public byte[] getFileData () {
+        return fileData;
     }
 
     public FileDataMessage setChecksum (byte[] checksum) {
@@ -88,9 +88,9 @@ public class FileDataMessage extends SystemMessage
             return true;
         }
 
-        byte[] rawData = getRawData ();
+        byte[] fileData = getFileData ();
         CRC64 crc = new CRC64 ();
-        crc.update (rawData, 0, rawData.length);
+        crc.update (fileData, 0, fileData.length);
         return Arrays.equals (checksum, crc.finish ());
     }
 

@@ -44,7 +44,7 @@ public class SystemMessage<MessageT extends SystemMessage> extends BeamMessage<M
     }
 
     public SystemMessage (boolean rawData, int type, byte[] data, boolean systemMessage) {
-        super (type, data, systemMessage);
+        super (type, data, systemMessage, rawData);
     }
 
     public SystemMessage (BeamMessage message) {
@@ -54,6 +54,13 @@ public class SystemMessage<MessageT extends SystemMessage> extends BeamMessage<M
     public BeamMessage toBeamMessage () {
         //used to cast down SystemMessage instance
         return new BeamMessage (this);
+    }
+
+    public BeamMessage toBeamMessage (byte[] data) {
+        //used to cast down SystemMessage instance
+        BeamMessage msg = new BeamMessage (this);
+        msg.data = data;
+        return msg;
     }
 
 }

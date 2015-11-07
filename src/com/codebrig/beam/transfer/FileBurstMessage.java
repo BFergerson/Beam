@@ -30,7 +30,6 @@
 package com.codebrig.beam.transfer;
 
 import com.codebrig.beam.messages.BeamMessage;
-import com.codebrig.beam.messages.LegacyMessage;
 import com.codebrig.beam.messages.SystemMessage;
 import com.codebrig.beam.messages.SystemMessageType;
 import java.util.ArrayList;
@@ -111,6 +110,9 @@ public class FileBurstMessage extends SystemMessage<FileBurstMessage>
     }
 
     public List<Integer> getConfirmedBlockList () {
+        if (confirmedBlocks == null) {
+            return new ArrayList<> ();
+        }
         return confirmedBlocks;
     }
 
