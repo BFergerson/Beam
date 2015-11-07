@@ -33,7 +33,9 @@ import com.codebrig.beam.Communicator;
 import com.codebrig.beam.connection.traversal.punch.udp.client.UDPHoleClient;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.LegacyMessage;
-import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.*;
+import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_MESSAGE_TYPE;
+import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_PEER_ACCESS_CODE;
+import static com.codebrig.beam.unit.connection.traversal.punch.udp.TestUDPPunchServer.TEST_PUNCH_PEER_IDENTIFIER;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>

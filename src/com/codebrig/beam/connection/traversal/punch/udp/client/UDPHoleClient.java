@@ -34,7 +34,6 @@ import com.codebrig.beam.Communicator;
 import com.codebrig.beam.connection.traversal.punch.udp.messages.UDPPunchMessage;
 import com.codebrig.beam.connection.traversal.punch.udp.messages.UDPPunchMessageType;
 import com.codebrig.beam.messages.BeamMessage;
-import com.codebrig.beam.messages.LegacyMessage;
 import com.codebrig.beam.utils.Generator;
 import java.io.IOException;
 import java.net.DatagramPacket;
