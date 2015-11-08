@@ -46,7 +46,7 @@ import java.util.Map;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
+public class LegacyMessage<MessageT extends LegacyMessage> extends BeamMessage<MessageT>
 {
 
     protected HashMap<String, List<String>> messageMap = new HashMap<> ();
@@ -169,19 +169,19 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return entrySetBuilder.build ().toByteArray ();
     }
 
-    public T remove (String key) {
+    public MessageT remove (String key) {
         messageMap.remove (key);
-        return (T) this;
+        return (MessageT) this;
     }
 
-    public T set (String key, String... value) {
+    public MessageT set (String key, String... value) {
         if (value.length == 0 || (value.length == 1 && value[0] == null)) {
             remove (key);
         } else {
             List<String> valueList = Arrays.asList (value);
             messageMap.put (key, valueList);
         }
-        return (T) this;
+        return (MessageT) this;
     }
 
     public String get (String key) {
@@ -197,7 +197,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return messageMap.get (key);
     }
 
-    public T setMessage (String key, LegacyMessage... value) {
+    public MessageT setMessage (String key, LegacyMessage... value) {
         if (value.length == 0 || (value.length == 1 && value[0] == null)) {
             remove (key);
         } else {
@@ -217,7 +217,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
 
             set (key, strArray);
         }
-        return (T) this;
+        return (MessageT) this;
     }
 
     public LegacyMessage getMessage (String key) {
@@ -248,7 +248,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
             return null;
         }
 
-        List<LegacyMessage> messageList = new ArrayList<LegacyMessage> ();
+        List<LegacyMessage> messageList = new ArrayList<> ();
         for (String str : strList) {
             if (str != null) {
                 byte[] fullData = Base64.decode (str);
@@ -272,18 +272,18 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return messageList;
     }
 
-    public T setBytes (String key, byte[] bytes) {
+    public MessageT setBytes (String key, byte[] bytes) {
         set (key, Base64.encode (bytes));
-        return (T) this;
+        return (MessageT) this;
     }
 
     public byte[] getBytes (String key) {
         return Base64.decode (getString (key));
     }
 
-    public T setByte (String key, byte value) {
+    public MessageT setByte (String key, byte value) {
         set (key, Byte.toString (value));
-        return (T) this;
+        return (MessageT) this;
     }
 
     public Byte getByte (String key) {
@@ -297,9 +297,9 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return ((Integer) ob).byteValue ();
     }
 
-    public T setBoolean (String key, Boolean... value) {
+    public MessageT setBoolean (String key, Boolean... value) {
         set (key, toStringArray ((Object[]) value));
-        return (T) this;
+        return (MessageT) this;
     }
 
     public Boolean getBoolean (String key) {
@@ -319,7 +319,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
             return null;
         }
 
-        List<Boolean> boolList = new ArrayList<Boolean> ();
+        List<Boolean> boolList = new ArrayList<> ();
         for (String str : strList) {
             boolList.add (Boolean.parseBoolean (str));
         }
@@ -327,9 +327,9 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return boolList;
     }
 
-    public T setInt (String key, Integer... value) {
+    public MessageT setInt (String key, Integer... value) {
         set (key, toStringArray ((Object[]) value));
-        return (T) this;
+        return (MessageT) this;
     }
 
     public Integer getInt (String key) {
@@ -355,7 +355,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
             return null;
         }
 
-        List<Integer> intList = new ArrayList<Integer> ();
+        List<Integer> intList = new ArrayList<> ();
         for (String str : strList) {
             intList.add (Integer.parseInt (str));
         }
@@ -363,9 +363,9 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return intList;
     }
 
-    public T setString (String key, String... value) {
+    public MessageT setString (String key, String... value) {
         set (key, value);
-        return (T) this;
+        return (MessageT) this;
     }
 
     public String getString (String key) {
@@ -381,9 +381,9 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return getList (key);
     }
 
-    public T setDate (String key, Date... value) {
+    public MessageT setDate (String key, Date... value) {
         set (key, toStringArray ((Object[]) value));
-        return (T) this;
+        return (MessageT) this;
     }
 
     public Date getDate (String key) {
@@ -396,7 +396,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
             return null;
         }
 
-        List<Date> dateList = new ArrayList<Date> ();
+        List<Date> dateList = new ArrayList<> ();
         for (String str : strList) {
             dateList.add (Date.valueOf (str));
         }
@@ -404,9 +404,9 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return dateList;
     }
 
-    public T setTimestamp (String key, Timestamp... value) {
+    public MessageT setTimestamp (String key, Timestamp... value) {
         set (key, toStringArray ((Object[]) value));
-        return (T) this;
+        return (MessageT) this;
     }
 
     public Timestamp getTimestamp (String key) {
@@ -419,7 +419,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
             return null;
         }
 
-        List<Timestamp> timestampList = new ArrayList<Timestamp> ();
+        List<Timestamp> timestampList = new ArrayList<> ();
         for (String str : strList) {
             timestampList.add (Timestamp.valueOf (str));
         }
@@ -427,9 +427,9 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return timestampList;
     }
 
-    public T setLong (String key, Long... value) {
+    public MessageT setLong (String key, Long... value) {
         set (key, toStringArray ((Object[]) value));
-        return (T) this;
+        return (MessageT) this;
     }
 
     public Long getLong (String key) {
@@ -453,7 +453,7 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
             return null;
         }
 
-        List<Long> longList = new ArrayList<Long> ();
+        List<Long> longList = new ArrayList<> ();
         for (String str : strList) {
             longList.add (Long.parseLong (str));
         }
@@ -461,11 +461,13 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return longList;
     }
 
-    public T setSuccessful (boolean successful) {
+    @Override
+    public MessageT setSuccessful (boolean successful) {
         setBoolean ("successful", successful);
-        return (T) this;
+        return (MessageT) this;
     }
 
+    @Override
     public boolean isSuccessful () {
         Boolean success = getBoolean ("successful");
         if (success == null) {
@@ -475,26 +477,35 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         return success;
     }
 
-    public T setErrorMessage (String errorMessage) {
+    @Override
+    public MessageT setErrorMessage (String errorMessage) {
         setString ("error_message", errorMessage);
-        return (T) this;
+        return (MessageT) this;
     }
 
+    @Override
     public String getErrorMessage () {
         return getString ("error_message");
     }
 
+    @Override
     public boolean hasErrorMessage () {
-        String errorMessage = getString ("error_message");
-        return errorMessage != null && !errorMessage.isEmpty ();
+        String errMessage = getString ("error_message");
+        return errMessage != null && !errMessage.isEmpty ();
     }
 
-    public T clear () {
+    public MessageT clear () {
         messageMap.clear ();
-        return (T) this;
+        return (MessageT) this;
     }
 
-    public T copy (T message) {
+    @Override
+    public LegacyMessage copy () {
+        return new LegacyMessage (this);
+    }
+
+    @Override
+    public void copy (MessageT message) {
         clear ();
         this.systemMessage = message.systemMessage;
         this.type = message.type;
@@ -511,36 +522,35 @@ public class LegacyMessage<T extends LegacyMessage> extends BeamMessage
         this.receivedTimestamp = message.receivedTimestamp;
         this.rawData = message.rawData;
         this.messageId = message.messageId;
-        return (T) this;
     }
 
     @Override
-    public T response () {
-        return (T) this;
+    public MessageT response () {
+        return (MessageT) this;
     }
 
-    public T emptyResponse () {
-        return (T) response ().clear ();
-    }
-
-    @Override
-    public T successResponse () {
-        T msg = response ();
-        return (T) msg.setSuccessful (true);
-    }
-
-    public T emptySuccessResponse () {
-        return (T) clear ().successResponse ();
+    public MessageT emptyResponse () {
+        return (MessageT) response ().clear ();
     }
 
     @Override
-    public T errorResponse () {
-        T msg = response ();
-        return (T) msg.setSuccessful (false);
+    public MessageT successResponse () {
+        MessageT msg = response ();
+        return (MessageT) msg.setSuccessful (true);
     }
 
-    public T emptyErrorResponse () {
-        return (T) clear ().errorResponse ();
+    public MessageT emptySuccessResponse () {
+        return (MessageT) clear ().successResponse ();
+    }
+
+    @Override
+    public MessageT errorResponse () {
+        MessageT msg = response ();
+        return (MessageT) msg.setSuccessful (false);
+    }
+
+    public MessageT emptyErrorResponse () {
+        return (MessageT) clear ().errorResponse ();
     }
 
     private String[] toStringArray (Object... value) {
