@@ -31,8 +31,7 @@ package com.codebrig.beam.example.chat;
 
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.handlers.BeamHandler;
-import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.handlers.SpecificBeamHandler;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
@@ -54,11 +53,11 @@ public class ExampleChatServer
         System.out.println ("Example chat server started!");
     }
 
-    public static class ExampleServerChatMessageHandler extends BeamHandler<ExampleChatMessage>
+    public static class ExampleServerChatMessageHandler extends SpecificBeamHandler<ExampleChatMessage>
     {
 
         public ExampleServerChatMessageHandler () {
-            super (ExampleChatMessage.CHAT_MESSAGE_ID);
+            super (ExampleChatMessage.CHAT_MESSAGE_ID, ExampleChatMessage.class);
         }
 
         @Override
@@ -71,10 +70,6 @@ public class ExampleChatServer
             return null;
         }
 
-        @Override
-        public ExampleChatMessage castMessage (BeamMessage message) {
-            return new ExampleChatMessage (message);
-        }
     }
 
 }

@@ -103,12 +103,12 @@ public abstract class BeamHandler<MessageT extends BeamMessage>
         //meant to be overridden
     }
 
-    public final MessageT processMessage (final Communicator comm, final MessageT message) {
-        MessageT processedMessage = processIncomingMessage (comm, message);
-        MessageT castedMessage = castMessage (processedMessage);
-        castedMessage.setMessageId (message.getMessageId ());
+    public final BeamMessage processMessage (final Communicator comm, final BeamMessage message) {
+        BeamMessage processedMessage = processIncomingMessage (comm, message);
+        MessageT convertedMessage = convertMessage (processedMessage);
+        convertedMessage.setMessageId (message.getMessageId ());
 
-        processedMessage = messageReceived (comm, castedMessage);
+        processedMessage = messageReceived (comm, convertedMessage);
         if (processedMessage != null) {
             processedMessage = processOutgoingMessage (comm, message, processedMessage);
 
@@ -120,21 +120,22 @@ public abstract class BeamHandler<MessageT extends BeamMessage>
         return processedMessage;
     }
 
-    public MessageT processIncomingMessage (final Communicator comm, final MessageT message) {
+    public BeamMessage processIncomingMessage (final Communicator comm, final BeamMessage message) {
         //no processing here; available to be overridden
         return message;
     }
 
-    public MessageT processOutgoingMessage (final Communicator comm,
-            final MessageT originalMessage, final MessageT responseMessage) {
+    public BeamMessage processOutgoingMessage (final Communicator comm,
+            final BeamMessage originalMessage, final BeamMessage responseMessage) {
         //no processing here; available to be overridden
         return responseMessage;
     }
 
     public abstract MessageT messageReceived (final Communicator comm, final MessageT message);
 
-    public <T extends BeamMessage> T castMessage (T message) {
-        return message;
+    public MessageT convertMessage (BeamMessage message) {
+        //no processing here; available to be overridden
+        return (MessageT) message;
     }
 
 }

@@ -31,8 +31,7 @@ package com.codebrig.beam.example.chat;
 
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.handlers.BeamHandler;
-import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.handlers.SpecificBeamHandler;
 import com.codebrig.beam.utils.Generator;
 import java.io.IOException;
 import java.util.Scanner;
@@ -71,11 +70,11 @@ public class ExampleChatClient
         }
     }
 
-    public static class ExampleChatMessageHandler extends BeamHandler<ExampleChatMessage>
+    public static class ExampleChatMessageHandler extends SpecificBeamHandler<ExampleChatMessage>
     {
 
         public ExampleChatMessageHandler () {
-            super (ExampleChatMessage.CHAT_MESSAGE_ID);
+            super (ExampleChatMessage.CHAT_MESSAGE_ID, ExampleChatMessage.class);
         }
 
         @Override
@@ -88,10 +87,6 @@ public class ExampleChatClient
             return null;
         }
 
-        @Override
-        public ExampleChatMessage castMessage (BeamMessage message) {
-            return new ExampleChatMessage (message);
-        }
     }
 
 }

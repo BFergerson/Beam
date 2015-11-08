@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014-2015 CodeBrig, LLC.
+ * Copyright (c) 2014-2015 CodeBrig, LLC.
  * http://www.codebrig.com/
  *
  * Beam - Client/Server & P2P Networking Library
@@ -29,38 +29,33 @@
  */
 package com.codebrig.beam.handlers;
 
-import com.codebrig.beam.Communicator;
 import com.codebrig.beam.messages.BeamMessage;
-import com.codebrig.beam.messages.LegacyMessage;
+import io.protostuff.Schema;
+import io.protostuff.runtime.RuntimeSchema;
 
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public abstract class LegacyHandler<MessageT extends LegacyMessage> extends BeamHandler
+public abstract class SpecificBeamHandler<MessageT extends BeamMessage> extends BeamHandler<MessageT>
 {
 
-    public LegacyHandler (int... types) {
-        super (types);
-    }
+    private final Class<? extends MessageT> messageClazz;
 
-    LegacyHandler (boolean systemHandler, int... types) {
-        super (systemHandler, types);
+    public SpecificBeamHandler (int messageType, Class<? extends MessageT> messageClazz) {
+        super (messageType);
+        this.messageClazz = messageClazz;
+
+        if (messageClazz == null) {
+            throw new IllegalArgumentException ("Message clazz cannot be null!");
+        }
     }
 
     @Override
-    public BeamMessage messageReceived (Communicator comm, BeamMessage message) {
-        return messageReceived (comm, convertMessage (convertMessage (message)));
+    public MessageT convertMessage (BeamMessage message) {
+        Schema<MessageT> schema = (Schema<MessageT>) RuntimeSchema.getSchema (messageClazz);
+        MessageT msg = schema.newMessage ();
+        msg.copy (message);
+        return msg;
     }
-
-    @Override
-    public LegacyMessage convertMessage (BeamMessage message) {
-        return new LegacyMessage (message);
-    }
-
-    public MessageT convertMessage (LegacyMessage message) {
-        return (MessageT) message;
-    }
-
-    public abstract MessageT messageReceived (Communicator comm, MessageT message);
 
 }
