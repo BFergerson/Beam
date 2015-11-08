@@ -173,13 +173,29 @@ public class BeamMessage<MessageT extends BeamMessage>
         }
     }
 
-    public MessageT copy () {
-        //todo: implement
-        return (MessageT) this;
+    public BeamMessage copy () {
+        return new BeamMessage (this);
     }
 
     public void copy (MessageT message) {
-        //todo: implement
+        this.data = message.data;
+        this.type = message.type;
+        this.systemMessage = message.systemMessage;
+        this.createdTimestamp = message.createdTimestamp;
+        this.rawData = message.rawData;
+        this.messageId = message.messageId;
+        this.successful = message.successful;
+        this.errorMessage = message.errorMessage;
+
+        if (rawData) {
+            this.data = message.getData ();
+        } else {
+            if (data != null) {
+                autoDeserialize (data);
+            } else {
+                autoDeserialize (message.getData ());
+            }
+        }
     }
 
     public MessageT response () {
