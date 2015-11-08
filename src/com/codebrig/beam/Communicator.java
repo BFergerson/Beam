@@ -667,7 +667,6 @@ public class Communicator implements Runnable
             }
 
             if (rtnMsg != null) {
-                //todo: below warning
                 if (msg instanceof EncryptedBeamMessage) {
                     //use encryption method in msg to decrypt rtnMsg
                     EncryptedBeamMessage encryptedMessage = (EncryptedBeamMessage) msg;
