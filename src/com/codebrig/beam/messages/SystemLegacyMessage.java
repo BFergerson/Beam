@@ -32,7 +32,7 @@ package com.codebrig.beam.messages;
 /**
  * @author Brandon Fergerson <brandon.fergerson@codebrig.com>
  */
-public class SystemLegacyMessage<T extends LegacyMessage> extends LegacyMessage<T>
+public class SystemLegacyMessage<MessageT extends LegacyMessage> extends LegacyMessage<LegacyMessage>
 {
 
     public SystemLegacyMessage (int type) {
