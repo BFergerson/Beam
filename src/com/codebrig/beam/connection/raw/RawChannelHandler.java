@@ -112,7 +112,7 @@ public class RawChannelHandler extends SystemHandler
             }
 
             if (waitForResponse) {
-                //dataMessage.clear (); todo: clear alternative
+                dataMessage.clearRawData ();
                 return dataMessage.setSuccessful (validChecksum);
             }
         }

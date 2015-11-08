@@ -102,6 +102,10 @@ public class RawDataMessage extends SystemMessage
         return _rawData;
     }
 
+    public void clearRawData () {
+        _rawData = null;
+    }
+
     public RawDataMessage setChecksum (byte[] checksum) {
         this.checksum = checksum;
         return this;
