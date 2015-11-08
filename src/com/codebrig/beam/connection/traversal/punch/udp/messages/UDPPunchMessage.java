@@ -90,4 +90,12 @@ public class UDPPunchMessage extends BeamMessage
         return listenPort;
     }
 
+    public void clear () {
+        peerIdentifier = null;
+        accessCode = null;
+        requestPeerIdentifier = null;
+        ipAddress = null;
+        listenPort = -1;
+    }
+
 }

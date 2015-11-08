@@ -63,7 +63,7 @@ public class HoleRequestHandler extends BeamHandler
 
         punchServer.getNATDeviceHolder ().addNATDevice (peerIdentifier, device);
 
-        //holeMessage.clear (); todo: clear alternative
+        holeMessage.clear ();
         return holeMessage.setSuccessful (true);
     }
 
