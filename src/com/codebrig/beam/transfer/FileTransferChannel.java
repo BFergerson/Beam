@@ -188,7 +188,7 @@ public class FileTransferChannel extends SystemHandler
                 } catch (InterruptedException ex) {
                 }
 
-                //burstMessage.clear (); todo: clear alternative
+                burstMessage.clear ();
                 burstMessage.setBurstConfirmationMessage (true);
                 do {
                     //send burst confirmation
@@ -350,7 +350,7 @@ public class FileTransferChannel extends SystemHandler
         } else {
             FileBurstMessage burstMessage = new FileBurstMessage (message);
             if (burstMessage.isBurstConfirmationMessage ()) {
-                //burstMessage.clear (); todo: clear alternative
+                burstMessage.clear ();
 
                 if (downloadedBlockSet.size () >= receiveBlockCount) {
                     receiveFinished = true;

@@ -125,4 +125,13 @@ public class FileBurstMessage extends SystemMessage<FileBurstMessage>
         return burstComplete;
     }
 
+    public void clear () {
+        blockCount = -1;
+        blockSize = -1;
+        lastBlockSize = -1;
+        burstConfirmation = false;
+        confirmedBlocks = null;
+        burstComplete = false;
+    }
+
 }
