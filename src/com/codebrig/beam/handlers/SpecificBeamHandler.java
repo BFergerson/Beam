@@ -41,7 +41,7 @@ public abstract class SpecificBeamHandler<MessageT extends BeamMessage> extends 
 
     private final Class<? extends MessageT> messageClazz;
 
-    public SpecificBeamHandler (int messageType, Class<? extends MessageT> messageClazz) {
+    public SpecificBeamHandler (int messageType, Class<MessageT> messageClazz) {
         super (messageType);
         this.messageClazz = messageClazz;
 
