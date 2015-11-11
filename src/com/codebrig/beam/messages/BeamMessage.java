@@ -29,10 +29,13 @@
  */
 package com.codebrig.beam.messages;
 
+import io.protostuff.JsonIOUtil;
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
 import io.protostuff.runtime.RuntimeSchema;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Arrays;
 
 /**
@@ -341,6 +344,24 @@ public class BeamMessage<MessageT extends BeamMessage>
             return false;
         }
         return this.messageId == other.messageId;
+    }
+
+    @Override
+    public String toString () {
+        if (rawData) {
+            return Arrays.toString (data);
+        } else {
+            //auto-serialize
+            StringWriter writer = new StringWriter ();
+            Schema<MessageT> schema = (Schema<MessageT>) RuntimeSchema.getSchema (getClass ());
+            MessageT message = (MessageT) this;
+            try {
+                JsonIOUtil.writeTo (writer, message, schema, false);
+            } catch (IOException ex) {
+                ex.printStackTrace ();
+            }
+            return writer.toString ();
+        }
     }
 
     private static final ThreadLocal<LinkedBuffer> localBuffer = new ThreadLocal<LinkedBuffer> ()
