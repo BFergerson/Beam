@@ -287,5 +287,5 @@ BeamMessage rtnMessage = peerComm.send (message);
 
 //convert and output Client A response
 message = new LegacyMessage (rtnMessage);
-System.out.println ("Client A sent: " + legacyMessage.getString ("client_message"));
+System.out.println ("Client A sent: " + message.getString ("client_message"));
 ```
